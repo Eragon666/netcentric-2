@@ -14,6 +14,7 @@ Op dinsdag 10-06-2014 zijn dit de bekende taken:
 
 Master-App: Door Daan, Mathijs en Xander
  - Ontvangen en versturen van data via Bluetooth.
+ - De andere stappen moeten worden bepaald door het team zelf.
 
 Slave-App: Floris, Mike en Patrick
 
