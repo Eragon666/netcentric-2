@@ -4,7 +4,7 @@ Het Project:
  - Robots bewegen binnen het stelsel en zoeken naar hun eigen, aangewezen punt.
     - Als een robot zijn eigen punt gevonden heeft, blijft hij op zijn positie wachten tot het centrale systeem de puzzel reset.
        - Onder puzzel wordt verstaan dat iedere robot zijn eigen doel-coordinaat heeft bereikt.
-    - Op het moment dat een robot het punt van een ander vind, wordt het coordinaat naar de juiste robot doorgestuurd.
+    - Op het moment dat een robot het punt van een ander vindt, wordt het coordinaat naar de juiste robot doorgestuurd.
        - Als een robot een coordinaat ontvangt van een andere robot, dan wordt gestopt met zoeken en begint de reis naar het ontvangen coordinaat.
  - Centraal systeem (laptop) houdt een lijst bij van de combinatie van robots en hen doel-coordinaten.
     - Op het moment dat iedere robot zijn doel-coordinaat heeft bereikt, dan geeft het centrale systeem een teken dat de puzzel is afgerond. En eventueel het sein dat een nieuwe puzzel begint, met voor iedere robot een nieuwe doel-coordinaat.
