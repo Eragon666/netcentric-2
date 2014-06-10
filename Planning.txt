@@ -16,13 +16,23 @@ Master-App: Door Daan, Mathijs en Xander
  - Ontvangen en versturen van data via Bluetooth.
 
 Slave-App: Floris, Mike en Patrick
+
+Initialisatie:
  - Installeren van een mobieltje op de robot.
  - Calibreren van de robot.
     - Vooruit (i.v.m. afstand) en draaien (i.v.m. richting).
- - Uitlezen van QR-code.
+ - Bepalen van de beginpositie.
+
+De puzzel oplossen:
+ - Bepaal de volgende positie.
+    - In de zoekfase: willekeurig.
+    - In de eindfase: volgende stap in kortste pad.
+ - Draai in de juiste richting.
+ - Rijd vooruit tot het volgende punt, vaste afstand.
+ - Lees de QR-code.
     - Nu is de locatie bekend.
- - Versturen van de locatie via Bluetooth naar de Master.
- - Ontvangen van de data via Bluetooth van de Master.
+ - Verstuur de locatie via Bluetooth naar de Master.
+ - Ontvang de data via Bluetooth van de Master.
     - De data bevat een boolean, bijvoorbeeld:
        - True, stuur de locatie naar de bijbehorende Slave.
           - In dit geval moet er ook een integer mee met daarin een ID-waarde van de desbetreffende Slave.
