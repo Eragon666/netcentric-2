@@ -1,0 +1,23 @@
+Het Project:
+ - Coördinaten Stelsel
+    - Ieder punt is QR-code.
+ - Robots bewegen binnen het stelsel en zoeken naar hun eigen, aangewezen punt.
+    - Als een robot zijn eigen punt gevonden heeft, blijft hij op zijn positie wachten tot het centrale systeem de puzzel reset.
+       - Onder puzzel wordt verstaan dat iedere robot zijn eigen doel-coördinaat heeft bereikt.
+    - Op het moment dat een robot het punt van een ander vind, wordt het coördinaat naar de juiste robot doorgestuurd.
+       - Als een robot een coördinaat ontvangt van een andere robot, dan wordt gestopt met zoeken en begint de reis naar het ontvangen coördinaat.
+ - Centraal systeem (laptop) houdt een lijst bij van de combinatie van robots en hen doel-coördinaten.
+    - Op het moment dat iedere robot zijn doel-coördinaat heeft bereikt, dan geeft het centrale systeem een teken dat de puzzel is afgerond. En eventueel het sein dat een nieuwe puzzel begint, met voor iedere robot een nieuwe doel-coördinaat.
+
+
+Op dinsdag 10-06-2014 zijn dit de bekende taken:
+
+Master-App: Door Daan, Mathijs en Xander
+ - Ontvangen en versturen van data via Bluetooth.
+
+Slave-App: Floris, Mike en Patrick
+ - Installeren van een mobieltje op de robot.
+ - Calibreren van de robot.
+    - Vooruit (i.v.m. afstand) en draaien (i.v.m. richting).
+ - Uitlezen van QR-code.
+ - Ontvangen en versturen van data via Bluetooth.
