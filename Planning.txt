@@ -20,4 +20,10 @@ Slave-App: Floris, Mike en Patrick
  - Calibreren van de robot.
     - Vooruit (i.v.m. afstand) en draaien (i.v.m. richting).
  - Uitlezen van QR-code.
- - Ontvangen en versturen van data via Bluetooth.
+    - Nu is de locatie bekend.
+ - Versturen van de locatie via Bluetooth naar de Master.
+ - Ontvangen van de data via Bluetooth van de Master.
+    - De data bevat een boolean, bijvoorbeeld:
+       - True, stuur de locatie naar de bijbehorende Slave.
+          - In dit geval moet er ook een integer mee met daarin een ID-waarde van de desbetreffende Slave.
+       - False, probeer een volgende positie.
