@@ -11,6 +11,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+<<<<<<< HEAD
 # Python
 
 *.mo
@@ -34,3 +35,12 @@ dist
 *.pyc
 *.pyo
 *.tmp*
+=======
+.gradle
+/local.properties
+/.idea/*.xml
+*.iml
+.DS_Store
+.DS_Store?
+build/
+>>>>>>> 546c363b77e274d574b35e976799e7df417669c2
