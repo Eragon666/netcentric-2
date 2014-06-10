@@ -1,3 +1,5 @@
+Big Independent Exploration Robot [BIER]
+
 Het Project:
  - Coordinaten Stelsel
     - Ieder punt is QR-code.
