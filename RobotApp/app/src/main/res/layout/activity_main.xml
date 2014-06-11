@@ -18,6 +18,31 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <FrameLayout
+                    android:id="@+id/cameraPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="90pt"
+                />
+                <TextView
+                    android:id="@+id/scanText"
+                    android:text="Scanning..."
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+                </TextView>
+                <Button
+                    android:id="@+id/ScanButton"
+                    android:text="Scan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
