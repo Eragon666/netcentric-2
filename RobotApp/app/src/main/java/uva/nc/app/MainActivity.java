@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Random;
 
 import uva.nc.ServiceActivity;
 import uva.nc.bluetooth.BluetoothService;
@@ -34,27 +32,16 @@ public class MainActivity extends ServiceActivity {
     private final MainActivityReceiver receiver = new MainActivityReceiver();
 
     // ID's for commands on mBed.
-    private static final int COMMAND_SUM = 1;
-    private static final int COMMAND_AVG = 2;
-    private static final int COMMAND_LED = 3;
+    // TODO mbed command id's
 
     // BT Controls.
     private TextView listenerStatusText;
     private TextView ownAddressText;
-    private TextView deviceCountText;
     private Button listenerButton;
-    private Button devicesButton;
-    private Button pingMasterButton;
-    private Button pingSlavesButton;
 
     // mBed controls.
     private TextView mbedConnectedText;
-    private Button mbedSumButton;
-    private Button mbedAvgButton;
-    private Button mbedLedButton;
-
-    // Random data for sample events.
-    private Random random = new Random();
+    // TODO initialize mbed buttons
 
     // Accessory to connect to when service is connected.
     private UsbAccessory toConnect;
@@ -108,64 +95,11 @@ public class MainActivity extends ServiceActivity {
         ownAddressText = (TextView)findViewById(R.id.own_address);
         listenerStatusText = (TextView)findViewById(R.id.listener_status);
         listenerButton = (Button)findViewById(R.id.listener);
-        deviceCountText = (TextView)findViewById(R.id.device_count);
-        devicesButton = (Button)findViewById(R.id.devices);
-        devicesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent launch = new Intent(MainActivity.this, DevicesActivity.class);
-                startActivity(launch);
-            }
-        });
         mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
-        pingMasterButton = (Button)findViewById(R.id.ping_master);
-        pingMasterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BluetoothService bluetooth = getBluetooth();
-                if (bluetooth != null) {
-                    bluetooth.slave.sendToMaster(random.nextInt(2500));
-                }
-            }
-        });
-        pingSlavesButton = (Button)findViewById(R.id.ping_slaves);
-        pingSlavesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BluetoothService bluetooth = getBluetooth();
-                if (bluetooth != null) {
-                    bluetooth.master.sendToAll(random.nextInt(10000) + 5000);
-                }
-            }
-        });
 
         // mBed controls.
-        mbedSumButton = (Button)findViewById(R.id.mbed_sum);
-        mbedSumButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float[] args = getRandomFloatArray(10);
-                toastShort("Sum of: \n" + Arrays.toString(args));
-                getMbed().manager.write(new MbedRequest(COMMAND_SUM, args));
-            }
-        });
-        mbedAvgButton = (Button)findViewById(R.id.mbed_avg);
-        mbedAvgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float[] args = getRandomFloatArray(10);
-                toastShort("Avg of:\n" + Arrays.toString(args));
-                getMbed().manager.write(new MbedRequest(COMMAND_AVG, args));
-            }
-        });
-        mbedLedButton = (Button)findViewById(R.id.mbed_led);
-        mbedLedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float[] args = getRandomLedArray();
-                getMbed().manager.write(new MbedRequest(COMMAND_LED, args));
-            }
-        });
+        // TODO Attach control to mbed buttons
+
     }
 
     private void refreshBluetoothControls() {
@@ -174,27 +108,16 @@ public class MainActivity extends ServiceActivity {
         String ownAddress = "Not available";
         String connected = "0";
         boolean slaveButtonEnabled = false;
-        boolean devicesButtonEnabled = false;
-        boolean allowPingMaster = false;
-        boolean allowPingSlaves = false;
 
         // Well it's not pretty, but it (barely) avoids duplicate logic.
         final BluetoothService bluetooth = getBluetooth();
         if (bluetooth != null) {
             slaveButtonEnabled = true;
-            devicesButtonEnabled = true;
             ownAddress = bluetooth.utility.getOwnAddress();
-
-            int devConnected = bluetooth.master.countConnected();
-            if (bluetooth.master.countConnected() > 0) {
-                connected = String.valueOf(devConnected);
-                allowPingSlaves = true;
-            }
 
             if (bluetooth.slave.isConnected()) {
                 slaveStatus = "Connected to " + bluetooth.slave.getRemoteDevice();
                 slaveButton = "Disconnect";
-                allowPingMaster = true;
                 listenerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -229,10 +152,6 @@ public class MainActivity extends ServiceActivity {
         listenerButton.setText(slaveButton);
         listenerButton.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
-        deviceCountText.setText(connected);
-        devicesButton.setEnabled(devicesButtonEnabled);
-        pingMasterButton.setEnabled(allowPingMaster);
-        pingSlavesButton.setEnabled(allowPingSlaves);
     }
 
     private void refreshMbedControls() {
@@ -246,33 +165,7 @@ public class MainActivity extends ServiceActivity {
         }
 
         mbedConnectedText.setText(connText);
-        mbedAvgButton.setEnabled(enableButtons);
-        mbedSumButton.setEnabled(enableButtons);
-        mbedLedButton.setEnabled(enableButtons);
-    }
-
-
-    // mBed random data.
-    private float[] getRandomFloatArray(int maxLength) {
-        if (maxLength < 1) {
-            maxLength = 1;
-        }
-
-        int length = random.nextInt(maxLength + 1);
-        float[] arr = new float[length];
-        for (int i = 0; i < length; i++) {
-            arr[i] = random.nextFloat();
-        }
-
-        return arr;
-    }
-
-    private float[] getRandomLedArray() {
-        float[] arr = new float[4];
-        for (int i = 0; i < 4; i++) {
-            arr[i] = random.nextBoolean() ? 0.0f : 1.0f;
-        }
-        return arr;
+        // TODO enable disabled buttons?
     }
 
 
@@ -340,16 +233,6 @@ public class MainActivity extends ServiceActivity {
                 } else {
                     toastShort("From master:\nnull");
                 }
-            } else if (action.equals(MasterManager.DEVICE_RECEIVED)) {
-
-                // Master received data from slave.
-                Serializable obj = intent.getSerializableExtra(MasterManager.EXTRA_OBJECT);
-                BluetoothDevice device = intent.getParcelableExtra(MasterManager.EXTRA_DEVICE);
-                if (obj != null) {
-                    toastShort("From " + device + "\n" + String.valueOf(obj));
-                } else {
-                    toastShort("From " + device + "\nnull!");
-                }
             } else if (action.equals(MbedManager.DATA_READ)) {
 
                 // mBed data received.
@@ -362,19 +245,7 @@ public class MainActivity extends ServiceActivity {
                     }
 
                     float[] values = response.getValues();
-                    if (response.getCommandId() == COMMAND_AVG) {
-                        if (values == null || values.length != 1) {
-                            toastShort("Error!");
-                        } else {
-                            toastShort("AVG: " + String.valueOf(values[0]));
-                        }
-                    } else if (response.getCommandId() == COMMAND_SUM) {
-                        if (values == null || values.length != 1) {
-                            toastShort("Error!");
-                        } else {
-                            toastShort("SUM: " + String.valueOf(values[0]));
-                        }
-                    }
+                    // TODO do something with received Mbed values
                 }
             }
         }

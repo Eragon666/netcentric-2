@@ -34,97 +34,6 @@
                 android:id="@+id/mbed_connected"
                 android:text="@string/not_connected" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sum"
-                    android:id="@+id/mbed_sum"
-                    android:enabled="false"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Average"
-                    android:id="@+id/mbed_avg"
-                    android:layout_alignBottom="@+id/scrollView"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:enabled="false"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LED party"
-                    android:id="@+id/mbed_led"
-                    android:enabled="false"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Bluetooth (master)"
-                android:id="@+id/master_mode_title"
-                android:textStyle="bold"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="2dp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="0"
-                    android:id="@+id/device_count"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="devices connected"
-                    android:id="@+id/device_count_label"
-                    android:layout_marginLeft="5dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/devices"
-                    android:text="Remote devices"
-                    android:enabled="false"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ping all"
-                    android:id="@+id/ping_slaves"
-                    android:enabled="false"
-                    android:layout_weight="1" />
-            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -180,7 +89,7 @@
                     android:enabled="false"
                     android:layout_weight="1" />
 
-                <Button
+                Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ping master"
