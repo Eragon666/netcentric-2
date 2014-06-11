@@ -2,8 +2,9 @@
  * network should and should not send.
  */
 
-/* The function "Parse(QRdata)" derives the location and a possible final
- * destination for the Robot/MBED with robotID from the given QRdata.
+/* The function "Parse(QRdata)" derives the location and a RobotID from the
+ * given QRdata. The Robot/MBED with the derived RobotID has its final
+ * destination at the derived currentLocation.
  */
 
 /* The function "ReserveLocation(currentLocation, direction)" tries to reserve
