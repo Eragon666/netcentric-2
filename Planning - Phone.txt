@@ -5,6 +5,20 @@
 /* The function "KortstePadSolver(currentLocation, finalDestination)"
  * determines the best possible step the Robot/MBED can do to reach its final
  * destination.
+ * 
+ * Simple example:
+ * // Assumed that (0, 0) is in the SouthWest corner. A different corner is easily fixed.
+ *
+ * if(abs(finalDestination.x - currentLocation.x) > abs(finalDestination.y - currentLocation.y))
+ *     if(finalDestination.x > currentLocation.x)
+ *         return East
+ *     else
+ *         return West
+ * else
+ *     if(finalDestination.y > currentLocation.y)
+ *         return North
+ *     else
+ *         return South
  */
 
 /* The function "UpdateLocation(currentLocation, direction)" changes the value
