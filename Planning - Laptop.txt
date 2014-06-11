@@ -1,0 +1,40 @@
+/* This is some pseudocode for the Laptop. This sets what every object in our
+ * network should and should not send.
+ */
+
+/* The function "Parse(QRdata)" derives the location and a possible final
+ * destination for the Robot/MBED with robotID from the given QRdata.
+ */
+
+/* The function "ReserveLocation(currentLocation, direction)" tries to reserve
+ * a location for the Robot/MBED. If it succeeds, this function returns true.
+ * If not, false.
+ */
+
+/* The function "UpdateReservedLocations(currentLocation)" updates the array
+ * of reserved locations of a certain Robot/MBED. Since each Robot/MBED only
+ * is allowed to have two reserved locations, the old reservations should be
+ * removed from the array. So, this function should remove all reservations of
+ * this Robot/MBED, except the one for the current location.
+ */
+
+/* The array "ReservedLocations[][]" is basically an array of tuples. These
+ * tuples consist of a RobotID and a location. It's used to prevent collisions
+ * of Robots/MBEDs, since the locations in this array are off limits for the
+ * other Robots/MBEDs.
+ */
+
+array ReservedLocations[] -> An entry: (RobotID, Location)
+
+while(!All Robot/MBED have reached finalDestination)
+	Receive QRdata from Phone through Bluetooth
+	currentLocation, robotID = Parse(QRdata)
+	UpdateReservedLocations(currentLocation)
+	Send currentLocation to Phone through Bluetooth
+	if(robotID != null)
+		finalDestination = currentLocation
+		Send finalDestination to Phone with robotID through Bluetooth
+	
+	Receive currentLocation, direction from Phone through Bluetooth
+	confirmation = ReserveLocation(currentLocation, direction)
+	Send confirmation to Phone through Bluetooth

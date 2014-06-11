@@ -1,0 +1,15 @@
+/* This is some pseudocode for the MBED. This sets what every object in our
+ * network should and should not send.
+ */
+
+/* The function "DriveTo(direction)" first sets the Robot/MBED into the
+ * right direction. Then drives for the determined distance to the next point
+ * on the grid. And, finally, turns back north to be able to scan the QR-code.
+ */
+
+boolean destinationReached = false
+while(!destinationReached)
+		/* Drives to the next location within the grid, based on the direction sent by the Phone. */
+		Receive direction from Phone through USB
+		DriveTo(direction);
+		Send ready to Phone through USB

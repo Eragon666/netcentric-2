@@ -1,0 +1,38 @@
+/* This is some pseudocode for the Phone. This sets what every object in our
+ * network should and should not send.
+ */
+
+/* The function "KortstePadSolver(currentLocation, finalDestination)"
+ * determines the best possible step the Robot/MBED can do to reach its final
+ * destination.
+ */
+
+/* The function "UpdateLocation(currentLocation, direction)" changes the value
+ * in currentLocation, according to the direction.
+ */
+
+/* The function "RandomDirection()" randomly picks a direction.
+ */
+
+boolean roaming = true
+
+while(!finalDestination)
+	Receive finalDestination from Laptop through Bluetooth
+	roaming = false
+	
+	Receive ready from MBED through USB
+	QRdata = ScanQR()
+	Send QRdata to Laptop through Bluetooth
+	Receive currentLocation from Laptop through Bluetooth
+	sent = false
+	while(!sent)
+		if(roaming)
+			direction = RandomDirection()
+		else if(!roaming)
+			direction = KortstePadSolver(currentLocation, finalDestination)
+		Send currentLocation, direction to Laptop through Bluetooth
+		Receive confirmation from Laptop through Bluetooth
+		if(confirmation)
+			Send direction to MBED through USB
+			currentLocation = UpdateLocation(currentLocation, direction)
+			sent = true
