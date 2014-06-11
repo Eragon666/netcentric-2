@@ -105,9 +105,7 @@ public class MainActivity extends ServiceActivity {
         preview.addView(mPreview);
 
         scanText = (TextView)findViewById(R.id.scanText);
-
         scanButton = (Button)findViewById(R.id.ScanButton);
-
         scanButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (barcodeScanned) {
