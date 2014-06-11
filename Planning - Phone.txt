@@ -2,6 +2,9 @@
  * network should and should not send.
  */
 
+/* The function "ScanQR()" scans for a QR-code and returns the retrieved data.
+ */
+
 /* The function "KortstePadSolver(currentLocation, finalDestination)"
  * determines the best possible step the Robot/MBED can do to reach its final
  * destination.
