@@ -7,6 +7,10 @@
 
     <uses-feature android:name="android.hardware.usb.accessory" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -22,10 +26,6 @@
             </intent-filter>
             <meta-data android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />
-        </activity>
-        <activity
-            android:name=".DevicesActivity"
-            android:label="@string/title_activity_devices">
         </activity>
     </application>
 

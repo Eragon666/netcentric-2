@@ -1,5 +1,7 @@
 package uva.nc.app;
 
+import uva.nc.app.CameraPreview;
+
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,13 +10,14 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.content.pm.ActivityInfo;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Random;
 
 import uva.nc.ServiceActivity;
 import uva.nc.bluetooth.BluetoothService;
@@ -25,8 +28,40 @@ import uva.nc.mbed.MbedRequest;
 import uva.nc.mbed.MbedResponse;
 import uva.nc.mbed.MbedService;
 
+import android.graphics.ImageFormat;
+import android.widget.FrameLayout;
+import android.view.View.OnClickListener;
+
+import android.hardware.Camera;
+import android.hardware.Camera.PreviewCallback;
+import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.Parameters;
+
+/* Import ZBar Class files */
+import net.sourceforge.zbar.ImageScanner;
+import net.sourceforge.zbar.Image;
+import net.sourceforge.zbar.Symbol;
+import net.sourceforge.zbar.SymbolSet;
+import net.sourceforge.zbar.Config;
+
 
 public class MainActivity extends ServiceActivity {
+
+    private Camera mCamera;
+    private CameraPreview mPreview;
+    private Handler autoFocusHandler;
+
+    TextView scanText;
+    Button scanButton;
+
+    ImageScanner scanner;
+
+    private boolean barcodeScanned = false;
+    private boolean previewing = true;
+
+    static {
+        System.loadLibrary("iconv");
+    }
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -34,27 +69,26 @@ public class MainActivity extends ServiceActivity {
     private final MainActivityReceiver receiver = new MainActivityReceiver();
 
     // ID's for commands on mBed.
-    private static final int COMMAND_SUM = 1;
-    private static final int COMMAND_AVG = 2;
-    private static final int COMMAND_LED = 3;
+    // TODO mbed command id's
+    private static final int COMMAND_DRIVE = 1;
 
     // BT Controls.
     private TextView listenerStatusText;
     private TextView ownAddressText;
-    private TextView deviceCountText;
     private Button listenerButton;
-    private Button devicesButton;
-    private Button pingMasterButton;
-    private Button pingSlavesButton;
 
     // mBed controls.
     private TextView mbedConnectedText;
-    private Button mbedSumButton;
-    private Button mbedAvgButton;
-    private Button mbedLedButton;
+    // TODO initialize mbed buttons
 
-    // Random data for sample events.
-    private Random random = new Random();
+    // Layout Controls
+    private Button showCameraLayout;
+    private Button showMbedLayout;
+    private Button showDebugLayout;
+
+    private LinearLayout cameraLayout;
+    private LinearLayout mbedLayout;
+    private LinearLayout debugLayout;
 
     // Accessory to connect to when service is connected.
     private UsbAccessory toConnect;
@@ -66,12 +100,196 @@ public class MainActivity extends ServiceActivity {
         setContentView(R.layout.activity_main);
         attachControls();
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        autoFocusHandler = new Handler();
+        mCamera = getCameraInstance();
+
+        /* Instance barcode scanner */
+        scanner = new ImageScanner();
+        scanner.setConfig(0, Config.X_DENSITY, 3);
+        scanner.setConfig(0, Config.Y_DENSITY, 3);
+
+        mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
+        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
+        preview.addView(mPreview);
+
+        scanText = (TextView)findViewById(R.id.scanText);
+
+        scanButton = (Button)findViewById(R.id.ScanButton);
+
+        scanButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (barcodeScanned) {
+                    barcodeScanned = false;
+                    scanText.setText("Scanning...");
+                    mCamera.setPreviewCallback(previewCb);
+                    mCamera.startPreview();
+                    previewing = true;
+                    mCamera.autoFocus(autoFocusCB);
+                }
+            }
+        });
+
+        cameraLayout = (LinearLayout)findViewById(R.id.camera_layout);
+        showCameraLayout = (Button)findViewById(R.id.show_camera_layout);
+        showCameraLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(cameraLayout.getVisibility() == View.VISIBLE) {
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                } else {
+                    cameraLayout.setVisibility(View.VISIBLE);
+                    showCameraLayout.setText("Hide Camera Preview");
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
+                }
+            }
+        });
+        mbedLayout = (LinearLayout)findViewById(R.id.mbed_layout);
+        showMbedLayout = (Button)findViewById(R.id.show_mbed_layout);
+        showMbedLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(mbedLayout.getVisibility() == View.VISIBLE) {
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
+                } else {
+                    mbedLayout.setVisibility(View.VISIBLE);
+                    showMbedLayout.setText("Hide Connections");
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
+                }
+            }
+        });
+        debugLayout = (LinearLayout)findViewById(R.id.debug_layout);
+        showDebugLayout = (Button)findViewById(R.id.show_debug_layout);
+        showDebugLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(debugLayout.getVisibility() == View.VISIBLE) {
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
+                } else {
+                    debugLayout.setVisibility(View.VISIBLE);
+                    showDebugLayout.setText("Hide Monitoring");
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
+                }
+            }
+        });
+        // TODO temporary random direction button, will be automated
+        Button tempButton = (Button)findViewById(R.id.temp);
+        tempButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 1.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+        Button temp2Button = (Button)findViewById(R.id.temp2);
+        temp2Button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 2.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+        Button temp3Button = (Button)findViewById(R.id.temp3);
+        temp3Button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 3.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+        Button temp4Button = (Button)findViewById(R.id.temp4);
+        temp4Button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 4.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+
         // If this intent was started with an accessory, store it temporarily and clear once connected.
         UsbAccessory accessory = getIntent().getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
         if (accessory != null) {
             this.toConnect = accessory;
         }
     }
+
+    /** A safe way to get an instance of the Camera object. */
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open();
+        } catch (Exception e){
+        }
+        return c;
+    }
+
+    private void releaseCamera() {
+        if (mCamera != null) {
+            previewing = false;
+            mCamera.setPreviewCallback(null);
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
+    private Runnable doAutoFocus = new Runnable() {
+        public void run() {
+            if (previewing)
+                mCamera.autoFocus(autoFocusCB);
+        }
+    };
+
+    PreviewCallback previewCb = new PreviewCallback() {
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            Camera.Parameters parameters = camera.getParameters();
+            Camera.Size size = parameters.getPreviewSize();
+
+            Image barcode = new Image(size.width, size.height, "Y800");
+            barcode.setData(data);
+
+            int result = scanner.scanImage(barcode);
+
+            if (result != 0) {
+                previewing = false;
+                mCamera.setPreviewCallback(null);
+                mCamera.stopPreview();
+
+                SymbolSet syms = scanner.getResults();
+                for (Symbol sym : syms) {
+                    String QRdata = sym.getData();
+                    scanText.setText("QR-Code: " + QRdata);
+                    final BluetoothService bluetooth = getBluetooth();
+                    if(bluetooth != null) {
+                        if (bluetooth.slave.isConnected()) {
+                            bluetooth.slave.sendToMaster(QRdata);
+                        }
+                    }
+                    barcodeScanned = true;
+                }
+            }
+        }
+    };
+
+    // Mimic continuous auto-focusing
+    AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
+        public void onAutoFocus(boolean success, Camera camera) {
+            autoFocusHandler.postDelayed(doAutoFocus, 1000);
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -84,6 +302,7 @@ public class MainActivity extends ServiceActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        releaseCamera();
         unregisterReceiver(receiver);
     }
 
@@ -108,64 +327,11 @@ public class MainActivity extends ServiceActivity {
         ownAddressText = (TextView)findViewById(R.id.own_address);
         listenerStatusText = (TextView)findViewById(R.id.listener_status);
         listenerButton = (Button)findViewById(R.id.listener);
-        deviceCountText = (TextView)findViewById(R.id.device_count);
-        devicesButton = (Button)findViewById(R.id.devices);
-        devicesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent launch = new Intent(MainActivity.this, DevicesActivity.class);
-                startActivity(launch);
-            }
-        });
         mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
-        pingMasterButton = (Button)findViewById(R.id.ping_master);
-        pingMasterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BluetoothService bluetooth = getBluetooth();
-                if (bluetooth != null) {
-                    bluetooth.slave.sendToMaster(random.nextInt(2500));
-                }
-            }
-        });
-        pingSlavesButton = (Button)findViewById(R.id.ping_slaves);
-        pingSlavesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BluetoothService bluetooth = getBluetooth();
-                if (bluetooth != null) {
-                    bluetooth.master.sendToAll(random.nextInt(10000) + 5000);
-                }
-            }
-        });
 
         // mBed controls.
-        mbedSumButton = (Button)findViewById(R.id.mbed_sum);
-        mbedSumButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float[] args = getRandomFloatArray(10);
-                toastShort("Sum of: \n" + Arrays.toString(args));
-                getMbed().manager.write(new MbedRequest(COMMAND_SUM, args));
-            }
-        });
-        mbedAvgButton = (Button)findViewById(R.id.mbed_avg);
-        mbedAvgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float[] args = getRandomFloatArray(10);
-                toastShort("Avg of:\n" + Arrays.toString(args));
-                getMbed().manager.write(new MbedRequest(COMMAND_AVG, args));
-            }
-        });
-        mbedLedButton = (Button)findViewById(R.id.mbed_led);
-        mbedLedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                float[] args = getRandomLedArray();
-                getMbed().manager.write(new MbedRequest(COMMAND_LED, args));
-            }
-        });
+        // TODO Attach control to mbed buttons
+
     }
 
     private void refreshBluetoothControls() {
@@ -174,27 +340,16 @@ public class MainActivity extends ServiceActivity {
         String ownAddress = "Not available";
         String connected = "0";
         boolean slaveButtonEnabled = false;
-        boolean devicesButtonEnabled = false;
-        boolean allowPingMaster = false;
-        boolean allowPingSlaves = false;
 
         // Well it's not pretty, but it (barely) avoids duplicate logic.
         final BluetoothService bluetooth = getBluetooth();
         if (bluetooth != null) {
             slaveButtonEnabled = true;
-            devicesButtonEnabled = true;
             ownAddress = bluetooth.utility.getOwnAddress();
-
-            int devConnected = bluetooth.master.countConnected();
-            if (bluetooth.master.countConnected() > 0) {
-                connected = String.valueOf(devConnected);
-                allowPingSlaves = true;
-            }
 
             if (bluetooth.slave.isConnected()) {
                 slaveStatus = "Connected to " + bluetooth.slave.getRemoteDevice();
                 slaveButton = "Disconnect";
-                allowPingMaster = true;
                 listenerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -229,10 +384,6 @@ public class MainActivity extends ServiceActivity {
         listenerButton.setText(slaveButton);
         listenerButton.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
-        deviceCountText.setText(connected);
-        devicesButton.setEnabled(devicesButtonEnabled);
-        pingMasterButton.setEnabled(allowPingMaster);
-        pingSlavesButton.setEnabled(allowPingSlaves);
     }
 
     private void refreshMbedControls() {
@@ -246,33 +397,7 @@ public class MainActivity extends ServiceActivity {
         }
 
         mbedConnectedText.setText(connText);
-        mbedAvgButton.setEnabled(enableButtons);
-        mbedSumButton.setEnabled(enableButtons);
-        mbedLedButton.setEnabled(enableButtons);
-    }
-
-
-    // mBed random data.
-    private float[] getRandomFloatArray(int maxLength) {
-        if (maxLength < 1) {
-            maxLength = 1;
-        }
-
-        int length = random.nextInt(maxLength + 1);
-        float[] arr = new float[length];
-        for (int i = 0; i < length; i++) {
-            arr[i] = random.nextFloat();
-        }
-
-        return arr;
-    }
-
-    private float[] getRandomLedArray() {
-        float[] arr = new float[4];
-        for (int i = 0; i < 4; i++) {
-            arr[i] = random.nextBoolean() ? 0.0f : 1.0f;
-        }
-        return arr;
+        // TODO enable disabled buttons?
     }
 
 
@@ -336,19 +461,39 @@ public class MainActivity extends ServiceActivity {
                 // Slave received data from master.
                 Serializable obj = intent.getSerializableExtra(SlaveManager.EXTRA_OBJECT);
                 if (obj != null) {
-                    toastShort("From master:\n" + String.valueOf(obj));
+                    /* Hier wordt de finalDestination ontvangen. */
+                    int finalDestination = Integer.valueOf(String.valueOf(obj));
+
+                    /* Hier wordt de currentLocation ontvangen. */
+                    int currentLocation = Integer.valueOf(String.valueOf(obj));
+                    int direction = 0;
+                    boolean sent = false;
+                    /* Deze boolean moet uiteindelijk ergens anders komen,
+                       maar nu is nog niet bekend waar. */
+                    boolean roaming = true;
+                    toastShort("From master:\n" + currentLocation);
+                    while(!sent) {
+                        //if(roaming)
+                            //direction = RandomDirection();
+                        //else
+                            //direction = KortstePadSolver(currentLocation, finalDestination);
+                        final BluetoothService bluetooth = getBluetooth();
+                        if(bluetooth != null) {
+                            if (bluetooth.slave.isConnected()) {
+                                //bluetooth.slave.sendToMaster(currentLocation, finalDestination);
+                            }
+                        }
+                    }
+
+                    /* Hier wordt de confirmation ontvangen. */
+                    boolean confirmation = Boolean.valueOf(String.valueOf(obj));
+                    if (confirmation) {
+                        // TODO Send 'direction' to MBED through USB
+                        //currentLocation = UpdateLocation(currentLocation, direction);
+                        sent = true;
+                    }
                 } else {
                     toastShort("From master:\nnull");
-                }
-            } else if (action.equals(MasterManager.DEVICE_RECEIVED)) {
-
-                // Master received data from slave.
-                Serializable obj = intent.getSerializableExtra(MasterManager.EXTRA_OBJECT);
-                BluetoothDevice device = intent.getParcelableExtra(MasterManager.EXTRA_DEVICE);
-                if (obj != null) {
-                    toastShort("From " + device + "\n" + String.valueOf(obj));
-                } else {
-                    toastShort("From " + device + "\nnull!");
                 }
             } else if (action.equals(MbedManager.DATA_READ)) {
 
@@ -362,17 +507,22 @@ public class MainActivity extends ServiceActivity {
                     }
 
                     float[] values = response.getValues();
-                    if (response.getCommandId() == COMMAND_AVG) {
+                    // TODO do something with received Mbed values
+                    if (response.getCommandId() == COMMAND_DRIVE) {
                         if (values == null || values.length != 1) {
                             toastShort("Error!");
                         } else {
-                            toastShort("AVG: " + String.valueOf(values[0]));
-                        }
-                    } else if (response.getCommandId() == COMMAND_SUM) {
-                        if (values == null || values.length != 1) {
-                            toastShort("Error!");
-                        } else {
-                            toastShort("SUM: " + String.valueOf(values[0]));
+                            // TODO if ok to scan (need to use values[])
+                            if((int)values[0] == 0) {
+                                if (barcodeScanned) {
+                                    barcodeScanned = false;
+                                    scanText.setText("Scanning...");
+                                    mCamera.setPreviewCallback(previewCb);
+                                    mCamera.startPreview();
+                                    previewing = true;
+                                    mCamera.autoFocus(autoFocusCB);
+                                }
+                            }
                         }
                     }
                 }
