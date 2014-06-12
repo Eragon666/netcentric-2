@@ -18,15 +18,25 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Camera Preview"
+                android:id="@+id/show_camera_layout"
+                android:layout_gravity="center_horizontal" />
+
             <LinearLayout
                 android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/camera_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <FrameLayout
                     android:id="@+id/cameraPreview"
-                    android:layout_width="match_parent"
-                    android:layout_height="90pt"
+                    android:layout_width="70pt"
+                    android:layout_height="70pt"
+                    android:layout_gravity="center"
                 />
                 <TextView
                     android:id="@+id/scanText"
@@ -43,67 +53,75 @@
                     />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="mBed"
-                android:id="@+id/mbed_title"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="bold"
-                android:layout_marginBottom="2dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/mbed_connected"
-                android:text="@string/not_connected" />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Bluetooth (slave)"
-                android:id="@+id/slave_mode_title"
-                android:textStyle="bold"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="10dp" />
-
-            <LinearLayout
-                android:orientation="horizontal"
+            <Button
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Own address:"
-                    android:id="@+id/own_address_prefix" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:id="@+id/own_address"
-                    android:layout_marginLeft="5dp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/listener_status"
-                android:text="Status not available"
-                android:layout_marginTop="5dp" />
+                android:text="Show Connections"
+                android:id="@+id/show_mbed_layout" />
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/mbed_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="mBed"
+                    android:id="@+id/mbed_title"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/mbed_connected"
+                    android:text="@string/not_connected" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Bluetooth (slave)"
+                    android:id="@+id/slave_mode_title"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginTop="10dp" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Own address:"
+                        android:id="@+id/own_address_prefix" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/own_address"
+                        android:layout_marginLeft="5dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/listener_status"
+                    android:text="Status not available"
+                    android:layout_marginTop="5dp" />
 
                 <Button
                     android:layout_width="wrap_content"
@@ -113,15 +131,20 @@
                     android:text="@string/start_listening"
                     android:enabled="false"
                     android:layout_weight="1" />
-
-                Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ping master"
-                    android:id="@+id/ping_master"
-                    android:enabled="false"
-                    android:layout_weight="1" />
             </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Monitoring"
+                android:id="@+id/show_debug_layout" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/debug_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"></LinearLayout>
 
         </LinearLayout>
     </ScrollView>

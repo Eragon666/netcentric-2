@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.pm.ActivityInfo;
 
@@ -30,7 +31,6 @@ import uva.nc.mbed.MbedService;
 import android.graphics.ImageFormat;
 import android.widget.FrameLayout;
 import android.view.View.OnClickListener;
-
 
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
@@ -80,6 +80,15 @@ public class MainActivity extends ServiceActivity {
     private TextView mbedConnectedText;
     // TODO initialize mbed buttons
 
+    // Layout Controls
+    private Button showCameraLayout;
+    private Button showMbedLayout;
+    private Button showDebugLayout;
+
+    private LinearLayout cameraLayout;
+    private LinearLayout mbedLayout;
+    private LinearLayout debugLayout;
+
     // Accessory to connect to when service is connected.
     private UsbAccessory toConnect;
 
@@ -115,6 +124,58 @@ public class MainActivity extends ServiceActivity {
                     mCamera.startPreview();
                     previewing = true;
                     mCamera.autoFocus(autoFocusCB);
+                }
+            }
+        });
+
+        cameraLayout = (LinearLayout)findViewById(R.id.camera_layout);
+        showCameraLayout = (Button)findViewById(R.id.show_camera_layout);
+        showCameraLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(cameraLayout.getVisibility() == View.VISIBLE) {
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                } else {
+                    cameraLayout.setVisibility(View.VISIBLE);
+                    showCameraLayout.setText("Hide Camera Preview");
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
+                }
+            }
+        });
+        mbedLayout = (LinearLayout)findViewById(R.id.mbed_layout);
+        showMbedLayout = (Button)findViewById(R.id.show_mbed_layout);
+        showMbedLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(mbedLayout.getVisibility() == View.VISIBLE) {
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
+                } else {
+                    mbedLayout.setVisibility(View.VISIBLE);
+                    showMbedLayout.setText("Hide Connections");
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
+                }
+            }
+        });
+        debugLayout = (LinearLayout)findViewById(R.id.debug_layout);
+        showDebugLayout = (Button)findViewById(R.id.show_debug_layout);
+        showDebugLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(debugLayout.getVisibility() == View.VISIBLE) {
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
+                } else {
+                    debugLayout.setVisibility(View.VISIBLE);
+                    showDebugLayout.setText("Hide Monitoring");
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
                 }
             }
         });
