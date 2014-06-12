@@ -38,4 +38,7 @@ while(!All Robot/MBED have reached finalDestination)
 	
 	Receive currentLocation, direction from Phone through Bluetooth
 	confirmation = ReserveLocation(currentLocation, direction)
-	Send confirmation to Phone through Bluetooth
+	if(confirmation)
+		Send confirmation to Phone through Bluetooth
+	else if(confirmation)
+		Send currentLocation to Phone through Bluetooth

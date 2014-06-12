@@ -90,6 +90,9 @@ public class MainActivity extends ServiceActivity {
     private LinearLayout mbedLayout;
     private LinearLayout debugLayout;
 
+    // Initialize monitoring log
+    private TextView logComm;
+
     // Accessory to connect to when service is connected.
     private UsbAccessory toConnect;
 
@@ -99,6 +102,8 @@ public class MainActivity extends ServiceActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         attachControls();
+
+        logComm = (TextView)findViewById(R.id.log_comm);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -190,6 +195,8 @@ public class MainActivity extends ServiceActivity {
                 args[0] = 1.0f;
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("Sent Drive forward message to mbed\n");
             }
         });
         Button temp2Button = (Button)findViewById(R.id.temp2);
@@ -199,6 +206,8 @@ public class MainActivity extends ServiceActivity {
                 args[0] = 2.0f;
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("Sent Drive backward message to mbed\n");
             }
         });
         Button temp3Button = (Button)findViewById(R.id.temp3);
@@ -208,6 +217,8 @@ public class MainActivity extends ServiceActivity {
                 args[0] = 3.0f;
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("Sent Drive left message to mbed\n");
             }
         });
         Button temp4Button = (Button)findViewById(R.id.temp4);
@@ -217,6 +228,8 @@ public class MainActivity extends ServiceActivity {
                 args[0] = 4.0f;
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("Sent Drive right message to mbed\n");
             }
         });
 
@@ -278,6 +291,7 @@ public class MainActivity extends ServiceActivity {
                             bluetooth.slave.sendToMaster(QRdata);
                         }
                     }
+                    logComm.append("Scanned:"+ QRdata + "\n");
                     barcodeScanned = true;
                 }
             }
@@ -513,6 +527,7 @@ public class MainActivity extends ServiceActivity {
                             toastShort("Error!");
                         } else {
                             // TODO if ok to scan (need to use values[])
+                            logComm.append("Received ok to scan message from mbed\n");
                             if((int)values[0] == 0) {
                                 if (barcodeScanned) {
                                     barcodeScanned = false;
@@ -523,6 +538,7 @@ public class MainActivity extends ServiceActivity {
                                     mCamera.autoFocus(autoFocusCB);
                                 }
                             }
+                            logComm.append("Scanning...\n");
                         }
                     }
                 }
