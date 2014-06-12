@@ -40,16 +40,15 @@ while(!finalDestination)
 	Receive ready from MBED through USB
 	QRdata = ScanQR()
 	Send QRdata to Laptop through Bluetooth
+
 	Receive currentLocation from Laptop through Bluetooth
-	sent = false
-	while(!sent)
-		if(roaming)
-			direction = RandomDirection()
-		else if(!roaming)
-			direction = KortstePadSolver(currentLocation, finalDestination)
-		Send currentLocation, direction to Laptop through Bluetooth
-		Receive confirmation from Laptop through Bluetooth
-		if(confirmation)
-			Send direction to MBED through USB
-			currentLocation = UpdateLocation(currentLocation, direction)
-			sent = true
+	if(roaming)
+		direction = RandomDirection()
+	else if(!roaming)
+		direction = KortstePadSolver(currentLocation, finalDestination)
+	Send currentLocation, direction to Laptop through Bluetooth
+
+	Receive confirmation from Laptop through Bluetooth
+	if(confirmation)
+		Send direction to MBED through USB
+		currentLocation = UpdateLocation(currentLocation, direction)
