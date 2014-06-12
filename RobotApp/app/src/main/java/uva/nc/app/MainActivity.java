@@ -114,7 +114,9 @@ public class MainActivity extends ServiceActivity {
         preview.addView(mPreview);
 
         scanText = (TextView)findViewById(R.id.scanText);
+
         scanButton = (Button)findViewById(R.id.ScanButton);
+
         scanButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (barcodeScanned) {
@@ -230,7 +232,14 @@ public class MainActivity extends ServiceActivity {
 
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
-                    scanText.setText("barcode result " + sym.getData());
+                    String QRdata = sym.getData();
+                    scanText.setText("QR-Code: " + QRdata);
+                    final BluetoothService bluetooth = getBluetooth();
+                    if(bluetooth != null) {
+                        if (bluetooth.slave.isConnected()) {
+                            bluetooth.slave.sendToMaster(QRdata);
+                        }
+                    }
                     barcodeScanned = true;
                 }
             }
@@ -414,7 +423,37 @@ public class MainActivity extends ServiceActivity {
                 // Slave received data from master.
                 Serializable obj = intent.getSerializableExtra(SlaveManager.EXTRA_OBJECT);
                 if (obj != null) {
-                    toastShort("From master:\n" + String.valueOf(obj));
+                    /* Hier wordt de finalDestination ontvangen. */
+                    int finalDestination = Integer.valueOf(String.valueOf(obj));
+
+                    /* Hier wordt de currentLocation ontvangen. */
+                    int currentLocation = Integer.valueOf(String.valueOf(obj));
+                    int direction = 0;
+                    boolean sent = false;
+                    /* Deze boolean moet uiteindelijk ergens anders komen,
+                       maar nu is nog niet bekend waar. */
+                    boolean roaming = true;
+                    toastShort("From master:\n" + currentLocation);
+                    while(!sent) {
+                        if(roaming)
+                            direction = RandomDirection();
+                        else
+                            direction = KortstePadSolver(currentLocation, finalDestination);
+                        final BluetoothService bluetooth = getBluetooth();
+                        if(bluetooth != null) {
+                            if (bluetooth.slave.isConnected()) {
+                                bluetooth.slave.sendToMaster(currentLocation, finalDestination);
+                            }
+                        }
+                    }
+
+                    /* Hier wordt de confirmation ontvangen. */
+                    boolean confirmation = Boolean.valueOf(String.valueOf(obj));
+                    if (confirmation) {
+                        // TODO Send 'direction' to MBED through USB
+                        currentLocation = UpdateLocation(currentLocation, direction);
+                        sent = true;
+                    }
                 } else {
                     toastShort("From master:\nnull");
                 }

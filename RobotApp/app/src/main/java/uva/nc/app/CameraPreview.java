@@ -43,23 +43,24 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
          * Set camera to continuous focus if supported, otherwise use
          * software auto-focus. Only works for API level >=9.
          */
-        /*
+/*
+        // Currently, this doesn't work properly. On Patrick's phone, the time
+        // it takes to focus actually takes longer, without any improvement.
         Camera.Parameters parameters = camera.getParameters();
         for (String f : parameters.getSupportedFocusModes()) {
             if (f == Parameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
-                mCamera.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                parameters.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
                 autoFocusCallback = null;
                 break;
             }
         }
-        */
-
-        // Install a SurfaceHolder.Callback so we get notified when the
+*/
+        // Install a SurfaceHolder.Callback, so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
 
-        // deprecated setting, but required on Android versions prior to 3.0
+        // Deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
