@@ -1,14 +1,18 @@
 package com.example.bluetoothcommunication.app;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,6 +22,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+
+    private String deviceAddress = "00:15:83:15:A3:10";
+    private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
     private Button On,Off,Visible,list;
     private BluetoothAdapter BA;
@@ -35,6 +42,19 @@ public class MainActivity extends Activity {
         lv = (ListView)findViewById(R.id.listView1);
 
         BA = BluetoothAdapter.getDefaultAdapter();
+
+        BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().
+                getRemoteDevice(deviceAddress);
+
+        try {
+            Log.i("Masterserver", "Connected");
+            BluetoothSocket socket = device.createRfcommSocketToServiceRecord(MY_UUID);
+
+            socket.connect();
+
+        } catch (IOException e) {
+            Log.e("Masterserver", "Error" + e);
+        }
     }
 
     public void on(View view){
