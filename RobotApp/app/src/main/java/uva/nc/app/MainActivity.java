@@ -70,6 +70,7 @@ public class MainActivity extends ServiceActivity {
 
     // ID's for commands on mBed.
     // TODO mbed command id's
+    private static final int COMMAND_DRIVE = 1;
 
     // BT Controls.
     private TextView listenerStatusText;
@@ -179,6 +180,43 @@ public class MainActivity extends ServiceActivity {
                     mbedLayout.setVisibility(View.GONE);
                     showMbedLayout.setText("Show Connections");
                 }
+            }
+        });
+        // TODO temporary random direction button, will be automated
+        Button tempButton = (Button)findViewById(R.id.temp);
+        tempButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 1.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+        Button temp2Button = (Button)findViewById(R.id.temp2);
+        temp2Button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 2.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+        Button temp3Button = (Button)findViewById(R.id.temp3);
+        temp3Button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 3.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+            }
+        });
+        Button temp4Button = (Button)findViewById(R.id.temp4);
+        temp4Button.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 4.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
             }
         });
 
@@ -435,14 +473,14 @@ public class MainActivity extends ServiceActivity {
                     boolean roaming = true;
                     toastShort("From master:\n" + currentLocation);
                     while(!sent) {
-                        if(roaming)
-                            direction = RandomDirection();
-                        else
-                            direction = KortstePadSolver(currentLocation, finalDestination);
+                        //if(roaming)
+                            //direction = RandomDirection();
+                        //else
+                            //direction = KortstePadSolver(currentLocation, finalDestination);
                         final BluetoothService bluetooth = getBluetooth();
                         if(bluetooth != null) {
                             if (bluetooth.slave.isConnected()) {
-                                bluetooth.slave.sendToMaster(currentLocation, finalDestination);
+                                //bluetooth.slave.sendToMaster(currentLocation, finalDestination);
                             }
                         }
                     }
@@ -451,7 +489,7 @@ public class MainActivity extends ServiceActivity {
                     boolean confirmation = Boolean.valueOf(String.valueOf(obj));
                     if (confirmation) {
                         // TODO Send 'direction' to MBED through USB
-                        currentLocation = UpdateLocation(currentLocation, direction);
+                        //currentLocation = UpdateLocation(currentLocation, direction);
                         sent = true;
                     }
                 } else {
@@ -470,6 +508,23 @@ public class MainActivity extends ServiceActivity {
 
                     float[] values = response.getValues();
                     // TODO do something with received Mbed values
+                    if (response.getCommandId() == COMMAND_DRIVE) {
+                        if (values == null || values.length != 1) {
+                            toastShort("Error!");
+                        } else {
+                            // TODO if ok to scan (need to use values[])
+                            if((int)values[0] == 0) {
+                                if (barcodeScanned) {
+                                    barcodeScanned = false;
+                                    scanText.setText("Scanning...");
+                                    mCamera.setPreviewCallback(previewCb);
+                                    mCamera.startPreview();
+                                    previewing = true;
+                                    mCamera.autoFocus(autoFocusCB);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
