@@ -11,6 +11,7 @@ import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.content.pm.ActivityInfo;
 
 import java.io.Serializable;
+import java.lang.Math;
 
 import uva.nc.ServiceActivity;
 import uva.nc.bluetooth.BluetoothService;
@@ -268,6 +270,8 @@ public class MainActivity extends ServiceActivity {
 
     PreviewCallback previewCb = new PreviewCallback() {
         public void onPreviewFrame(byte[] data, Camera camera) {
+            /* Hier wordt de QR-code gescand, maar dit moet dus verplaatst
+               worden naar de plek waar MBED-signalen worden ontvangen. */
             Camera.Parameters parameters = camera.getParameters();
             Camera.Size size = parameters.getPreviewSize();
 
@@ -288,7 +292,8 @@ public class MainActivity extends ServiceActivity {
                     final BluetoothService bluetooth = getBluetooth();
                     if(bluetooth != null) {
                         if (bluetooth.slave.isConnected()) {
-                            bluetooth.slave.sendToMaster(QRdata);
+                            toastShort("To Master:\n" + QRdata);
+                            bluetooth.slave.sendToMaster("QRdata: " + QRdata);
                         }
                     }
                     logComm.append("Scanned:"+ QRdata + "\n");
@@ -417,6 +422,11 @@ public class MainActivity extends ServiceActivity {
 
     // Broadcast receiver which handles incoming events. If it were smaller, inline it.
     private class MainActivityReceiver extends BroadcastReceiver {
+        String finalDestination = "[0, 0]";
+        String currentLocation = "[0, 0]";
+        String direction = "None";
+        String confirmation = "False";
+        boolean roaming = true;
 
         // Refresh BT controls on these events.
         private final String BLUETOOTH_REFRESH_ON[] = { MasterManager.DEVICE_ADDED,
@@ -475,36 +485,37 @@ public class MainActivity extends ServiceActivity {
                 // Slave received data from master.
                 Serializable obj = intent.getSerializableExtra(SlaveManager.EXTRA_OBJECT);
                 if (obj != null) {
-                    /* Hier wordt de finalDestination ontvangen. */
-                    int finalDestination = Integer.valueOf(String.valueOf(obj));
+                    String Input = String.valueOf(obj);
 
-                    /* Hier wordt de currentLocation ontvangen. */
-                    int currentLocation = Integer.valueOf(String.valueOf(obj));
-                    int direction = 0;
-                    boolean sent = false;
-                    /* Deze boolean moet uiteindelijk ergens anders komen,
-                       maar nu is nog niet bekend waar. */
-                    boolean roaming = true;
-                    toastShort("From master:\n" + currentLocation);
-                    while(!sent) {
-                        //if(roaming)
-                            //direction = RandomDirection();
-                        //else
-                            //direction = KortstePadSolver(currentLocation, finalDestination);
+                    if(Input.contains("finalDestination: ")) {
+                        /* Hier wordt de finalDestination ontvangen. */
+                        finalDestination = Input.replace("finalDestination: ", "");
+                        roaming = false;
+                    } else if(Input.contains("currentLocation: ")) {
+                        /* Hier wordt de currentLocation ontvangen. */
+                        currentLocation = Input.replace("currentLocation: ", "");
+
+                        scanText.setText("Current Location: " + currentLocation);
+                        if(roaming)
+                            direction = RandomDirection();
+                        else
+                            direction = KortstePadSolver(currentLocation, finalDestination);
                         final BluetoothService bluetooth = getBluetooth();
-                        if(bluetooth != null) {
+                        if (bluetooth != null) {
                             if (bluetooth.slave.isConnected()) {
-                                //bluetooth.slave.sendToMaster(currentLocation, finalDestination);
+                                toastShort("To Master:\n" + direction);
+                                /* bluetooth.slave.sendToMaster(currentLocation, direction); */
+                                bluetooth.slave.sendToMaster("direction: " + direction);
                             }
                         }
-                    }
-
-                    /* Hier wordt de confirmation ontvangen. */
-                    boolean confirmation = Boolean.valueOf(String.valueOf(obj));
-                    if (confirmation) {
-                        // TODO Send 'direction' to MBED through USB
-                        //currentLocation = UpdateLocation(currentLocation, direction);
-                        sent = true;
+                    } else if (Input.contains("confirmation: ")) {
+                        /* Hier wordt de confirmation ontvangen. */
+                        confirmation = Input.replace("confirmation: ", "");
+                        toastShort("confirmation: " + confirmation);
+                        if (confirmation == "True") {
+                            // TODO Send 'direction' to MBED through USB
+                            currentLocation = UpdateLocation(currentLocation, direction);
+                        }
                     }
                 } else {
                     toastShort("From master:\nnull");
@@ -543,6 +554,56 @@ public class MainActivity extends ServiceActivity {
                     }
                 }
             }
+        }
+
+        public String RandomDirection() {
+            int direction = 1 + (int)(Math.random() * ((4 - 1) + 1));
+            if (direction == 1)
+                return "North";
+            else if (direction == 2)
+                return "East";
+            else if (direction == 3)
+                return "South";
+            else if (direction == 4)
+                return "West";
+            return "None";
+        }
+
+        public String KortstePadSolver(String currentLocation, String finalDestination) {
+            /* currentLocation -> "[x, y]" */
+            /* finalDestination -> "[x, y]" */
+            int currentX = Integer.valueOf(String.valueOf(currentLocation.charAt(1)));
+            int currentY = Integer.valueOf(String.valueOf(currentLocation.charAt(4)));
+            int finalX = Integer.valueOf(String.valueOf(finalDestination.charAt(1)));
+            int finalY = Integer.valueOf(String.valueOf(finalDestination.charAt(4)));
+
+            if (Math.abs(finalX - currentX) > Math.abs(finalY - currentY)) {
+                if (finalX > currentX)
+                    return "East";
+                else
+                    return "West";
+            } else {
+                if (finalY > currentY)
+                    return "North";
+                else
+                    return "South";
+            }
+        }
+
+        public String UpdateLocation(String currentLocation, String direction) {
+            /* currentLocation -> "[x, y]" */
+            int currentX = Integer.valueOf(String.valueOf(currentLocation.charAt(1)));
+            int currentY = Integer.valueOf(String.valueOf(currentLocation.charAt(4)));
+            if (direction == "North")
+                return "[" + currentX + ", " + (currentY + 1) + "]";
+            else if (direction == "East")
+                return "[" + (currentX + 1) + ", " + currentY + "]";
+            else if (direction == "South")
+                return "[" + currentX + ", " + (currentY - 1) + "]";
+            else if (direction == "West")
+                return "[" + (currentX - 1) + ", " + currentY + "]";
+            else
+                return "[" + currentX + ", " + currentY + "]";
         }
     }
 }
