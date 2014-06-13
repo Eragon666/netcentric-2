@@ -42,5 +42,11 @@ dist
 *.iml
 .DS_Store
 .DS_Store?
+.idea/*
+.idea/
+/bluetoothcommunication/.idea/*
+/bluetoothcommunication/.idea/
+/masterserver/.idea/*
+/masterserver/.idea/
 
 
