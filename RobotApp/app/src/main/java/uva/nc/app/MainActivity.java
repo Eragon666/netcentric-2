@@ -48,30 +48,12 @@ import net.sourceforge.zbar.Config;
 
 
 public class MainActivity extends ServiceActivity {
-
-    private Camera mCamera;
-    private CameraPreview mPreview;
-    private Handler autoFocusHandler;
-
-    TextView scanText;
-    Button scanButton;
-
-    ImageScanner scanner;
-
-    private boolean barcodeScanned = false;
-    private boolean previewing = true;
-
-    static {
-        System.loadLibrary("iconv");
-    }
-
     private static final String TAG = MainActivity.class.getName();
 
     // Receiver implemented in separate class, see bottom of file.
     private final MainActivityReceiver receiver = new MainActivityReceiver();
 
     // ID's for commands on mBed.
-    // TODO mbed command id's
     private static final int COMMAND_DRIVE = 1;
 
     // BT Controls.
@@ -81,22 +63,42 @@ public class MainActivity extends ServiceActivity {
 
     // mBed controls.
     private TextView mbedConnectedText;
-    // TODO initialize mbed buttons
 
     // Layout Controls
     private Button showCameraLayout;
     private Button showMbedLayout;
     private Button showDebugLayout;
 
+    // Layout variables to identify the frames
     private LinearLayout cameraLayout;
     private LinearLayout mbedLayout;
     private LinearLayout debugLayout;
 
-    // Initialize monitoring log
+    // Declare monitoring log variable
     private TextView logComm;
 
     // Accessory to connect to when service is connected.
     private UsbAccessory toConnect;
+
+    //Declare variables for the Camera and QR scanner
+    private Camera mCamera;
+    private CameraPreview mPreview;
+    private Handler autoFocusHandler;
+
+    // TODO These buttons can be removed in the final version
+    TextView scanText;
+    Button scanButton;
+
+    ImageScanner scanner;
+
+    // Initialize variables for the QR scanner
+    private boolean barcodeScanned = false;
+    private boolean previewing = true;
+
+    // Load QR scanner library
+    static {
+        System.loadLibrary("iconv");
+    }
 
 
     @Override
@@ -105,39 +107,12 @@ public class MainActivity extends ServiceActivity {
         setContentView(R.layout.activity_main);
         attachControls();
 
+        // Attach logging TextView
         logComm = (TextView)findViewById(R.id.log_comm);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        autoFocusHandler = new Handler();
-        mCamera = getCameraInstance();
-
-        /* Instance barcode scanner */
-        scanner = new ImageScanner();
-        scanner.setConfig(0, Config.X_DENSITY, 3);
-        scanner.setConfig(0, Config.Y_DENSITY, 3);
-
-        mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
-        preview.addView(mPreview);
-
-        scanText = (TextView)findViewById(R.id.scanText);
-
-        scanButton = (Button)findViewById(R.id.ScanButton);
-
-        scanButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (barcodeScanned) {
-                    barcodeScanned = false;
-                    scanText.setText("Scanning...");
-                    mCamera.setPreviewCallback(previewCb);
-                    mCamera.startPreview();
-                    previewing = true;
-                    mCamera.autoFocus(autoFocusCB);
-                }
-            }
-        });
-
+        /***
+         * Attach layout buttons
+         **/
         cameraLayout = (LinearLayout)findViewById(R.id.camera_layout);
         showCameraLayout = (Button)findViewById(R.id.show_camera_layout);
         showCameraLayout.setOnClickListener(new OnClickListener() {
@@ -189,6 +164,7 @@ public class MainActivity extends ServiceActivity {
                 }
             }
         });
+
         // TODO temporary random direction button, will be automated
         Button tempButton = (Button)findViewById(R.id.temp);
         tempButton.setOnClickListener(new OnClickListener() {
@@ -240,75 +216,42 @@ public class MainActivity extends ServiceActivity {
         if (accessory != null) {
             this.toConnect = accessory;
         }
-    }
 
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance(){
-        Camera c = null;
-        try {
-            c = Camera.open();
-        } catch (Exception e){
-        }
-        return c;
-    }
+        /***
+         * Code for QR scanner
+         * Source: ZBarAndroidSDK-0.2 example
+         **/
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-    private void releaseCamera() {
-        if (mCamera != null) {
-            previewing = false;
-            mCamera.setPreviewCallback(null);
-            mCamera.release();
-            mCamera = null;
-        }
-    }
+        autoFocusHandler = new Handler();
+        mCamera = getCameraInstance();
 
-    private Runnable doAutoFocus = new Runnable() {
-        public void run() {
-            if (previewing)
-                mCamera.autoFocus(autoFocusCB);
-        }
-    };
+        /* Instance barcode scanner */
+        scanner = new ImageScanner();
+        scanner.setConfig(0, Config.X_DENSITY, 3);
+        scanner.setConfig(0, Config.Y_DENSITY, 3);
 
-    PreviewCallback previewCb = new PreviewCallback() {
-        public void onPreviewFrame(byte[] data, Camera camera) {
-            /* Hier wordt de QR-code gescand, maar dit moet dus verplaatst
-               worden naar de plek waar MBED-signalen worden ontvangen. */
-            Camera.Parameters parameters = camera.getParameters();
-            Camera.Size size = parameters.getPreviewSize();
+        // Add camera preview to layout
+        mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
+        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
+        preview.addView(mPreview);
 
-            Image barcode = new Image(size.width, size.height, "Y800");
-            barcode.setData(data);
-
-            int result = scanner.scanImage(barcode);
-
-            if (result != 0) {
-                previewing = false;
-                mCamera.setPreviewCallback(null);
-                mCamera.stopPreview();
-
-                SymbolSet syms = scanner.getResults();
-                for (Symbol sym : syms) {
-                    String QRdata = sym.getData();
-                    scanText.setText("QR-Code: " + QRdata);
-                    final BluetoothService bluetooth = getBluetooth();
-                    if(bluetooth != null) {
-                        if (bluetooth.slave.isConnected()) {
-                            toastShort("To Master:\n" + QRdata);
-                            bluetooth.slave.sendToMaster("QRdata: " + QRdata);
-                        }
-                    }
-                    logComm.append("Scanned:"+ QRdata + "\n");
-                    barcodeScanned = true;
+        // TODO To be removed in the final version
+        scanText = (TextView)findViewById(R.id.scanText);
+        scanButton = (Button)findViewById(R.id.ScanButton);
+        scanButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (barcodeScanned) {
+                    barcodeScanned = false;
+                    scanText.setText("Scanning...");
+                    mCamera.setPreviewCallback(previewCb);
+                    mCamera.startPreview();
+                    previewing = true;
+                    mCamera.autoFocus(autoFocusCB);
                 }
             }
-        }
-    };
-
-    // Mimic continuous auto-focusing
-    AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
-        public void onAutoFocus(boolean success, Camera camera) {
-            autoFocusHandler.postDelayed(doAutoFocus, 1000);
-        }
-    };
+        });
+    }
 
     @Override
     protected void onResume() {
@@ -349,7 +292,7 @@ public class MainActivity extends ServiceActivity {
         mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
 
         // mBed controls.
-        // TODO Attach control to mbed buttons
+        // TODO Attach control to mbed buttons?
 
     }
 
@@ -418,6 +361,78 @@ public class MainActivity extends ServiceActivity {
         mbedConnectedText.setText(connText);
         // TODO enable disabled buttons?
     }
+
+
+    /***
+     * Functions for QR scanner
+     * Source: ZBarAndroidSDK-0.2 example
+     **/
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open();
+        } catch (Exception e){
+        }
+        return c;
+    }
+
+    private void releaseCamera() {
+        if (mCamera != null) {
+            previewing = false;
+            mCamera.setPreviewCallback(null);
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
+    private Runnable doAutoFocus = new Runnable() {
+        public void run() {
+            if (previewing)
+                mCamera.autoFocus(autoFocusCB);
+        }
+    };
+
+    PreviewCallback previewCb = new PreviewCallback() {
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            /* Hier wordt de QR-code gescand, maar dit moet dus verplaatst
+               worden naar de plek waar MBED-signalen worden ontvangen. */
+            Camera.Parameters parameters = camera.getParameters();
+            Camera.Size size = parameters.getPreviewSize();
+
+            Image barcode = new Image(size.width, size.height, "Y800");
+            barcode.setData(data);
+
+            int result = scanner.scanImage(barcode);
+
+            if (result != 0) {
+                previewing = false;
+                mCamera.setPreviewCallback(null);
+                mCamera.stopPreview();
+
+                SymbolSet syms = scanner.getResults();
+                for (Symbol sym : syms) {
+                    String QRdata = sym.getData();
+                    scanText.setText("QR-Code: " + QRdata);
+                    final BluetoothService bluetooth = getBluetooth();
+                    if(bluetooth != null) {
+                        if (bluetooth.slave.isConnected()) {
+                            toastShort("To Master:\n" + QRdata);
+                            bluetooth.slave.sendToMaster("QRdata: " + QRdata);
+                        }
+                    }
+                    logComm.append("Scanned:"+ QRdata + "\n");
+                    barcodeScanned = true;
+                }
+            }
+        }
+    };
+
+    // Mimic continuous auto-focusing
+    AutoFocusCallback autoFocusCB = new AutoFocusCallback() {
+        public void onAutoFocus(boolean success, Camera camera) {
+            autoFocusHandler.postDelayed(doAutoFocus, 1000);
+        }
+    };
 
 
     // Broadcast receiver which handles incoming events. If it were smaller, inline it.
