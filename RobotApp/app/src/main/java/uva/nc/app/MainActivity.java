@@ -552,6 +552,9 @@ public class MainActivity extends ServiceActivity {
                         toastShort("confirmation: " + confirmation);
                         if (confirmation == "True") {
                             // TODO Send 'direction' to MBED through USB
+					float[] args = new float[1];
+                            args[0] = Integer.valueOf(direction);
+                            getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
                             currentLocation = UpdateLocation(currentLocation, direction);
                         }
                     }
