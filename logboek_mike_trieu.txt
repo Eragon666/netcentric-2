@@ -1,0 +1,51 @@
+Mike Trieu
+6366295 / 10105093
+Netcentric Computing - Labreport Week 2-4
+
+10/6/2014
+- Hoorcollege Netcentric Computing door Toto van Inge
+- Brainstorm sessie met groepje (6 personen)
+- Onderwerp besloten
+- Robot communicatie door middel van Bluetooth
+- Taken zijn verdeeld onder twee groepjes van drie
+  - mBed + Android App
+    Hier hoor ik bij
+  - Computer programma (python)
+- Github is aangemaakt
+- Framework van opdracht week 1 op github gezet
+- Programma’s zijn klaar gezet
+  - Android Studio
+  - Mbed Online Compiler
+  - SourceTree
+  - Tera Term
+- Hardware is klaar gezet?
+  - mbed microcomputer
+  - mbed board
+  - driewieler robot
+  - HTC Android mobiel
+- Library voor QR scanner gevonden: Zbar
+- Omni robot aangesloten
+- Zbar voorbeeld code doorgekeken
+
+11/6/2014
+- Onnodige functies van framework verwijderd
+- Zbar geimplementeerd, QR scanner werkt
+- Layout is nog buggy, waarschijnlijk wordt er een tab layout geimplementeerd morgen
+- Bijgedragen aan plan van aanpak voor het communiceren tussen master laptop en slave mobieltjes [met Patrick]
+
+12/6/2014
+- Layout van robotApp is verbeterd. Onderdelen van de app is opgesplitst voor overzichtelijkheid
+- Tijdelijke knoppen gemaakt in robotApp om de besturing en communicatie te testen
+- Calibreren van robot. Dit is nog niet goed gelukt, omdat de kabels zitten in de weg. [met Floris]
+- QR scanner wordt actief wanneer robot klaar is met bewegen.
+- Logging van communicatie is toegevoegd aan de robotApp
+
+13/6/2014
+- Code robotApp schoonmaken
+
+
+
+16/6/2014
+- Omnibot wireless maken [met Floris]
+- Omnibot automatisch laten rijden na scannen van QR code [met Patrick]
+- 
