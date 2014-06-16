@@ -1,4 +1,3 @@
-
 from bluetooth import *
 
 server_sock=BluetoothSocket( RFCOMM )

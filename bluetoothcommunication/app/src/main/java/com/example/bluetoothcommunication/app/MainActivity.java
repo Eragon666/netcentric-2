@@ -30,7 +30,6 @@ public class MainActivity extends Activity {
     private Set<BluetoothDevice> pairedDevices;
     private ListView lv;
     private BluetoothThread connection;
-    //private BluetoothThread.Listener listener;
 
     BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().
             getRemoteDevice(deviceAddress);
@@ -64,7 +63,7 @@ public class MainActivity extends Activity {
             Log.e("Masterserver", "Error" + e);
         }
 
-        connection = BluetoothThread.newInstance(socket);
+        connection = BluetoothThread.newInstance(socket, bluetoothListener);
 
 
     }
@@ -107,22 +106,47 @@ public class MainActivity extends Activity {
 
     }
 
-    public void visible(View view) {
-        Intent getVisible = new Intent(BluetoothAdapter.
-                ACTION_REQUEST_DISCOVERABLE);
-        startActivityForResult(getVisible, 0);
-
-    }
-
-
-        @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+    private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
+        public void onConnected() {
+            Log.i("Masterserver", "Connected bluetooth 12");
+            MainActivity.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    Log.i("Masterserver", "Connected bluetooth");
+                    //MainActivity.this.onConnected(true);
+                }
+            });
+        }
+
+        public void onDisconnected() {
+            Log.i("Masterserver", "disConnected bluetooth");
+            MainActivity.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    //MainActivity.this.onConnected(false);
+                }
+            });
+        }
+
+        public void onError(IOException e) {
+        }
+
+        public void onReceived(byte[] buffer, int length) {
+            Log.i("Masterserver", "received message with length" + length);
+            // copy to string
+            final String stringData = new String(buffer, 0, length);
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    //onReceivedString(stringData);
+                }
+            });
+        }
+    };
+
 
 }
-
-
