@@ -57,6 +57,13 @@
                 android:onClick="off"
                 android:text="@string/off" />
 
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="send"
+                android:text="Send " />
+
             <ListView
                 android:id="@+id/listView1"
                 android:layout_width="match_parent"
