@@ -550,12 +550,24 @@ public class MainActivity extends ServiceActivity {
                         /* Hier wordt de confirmation ontvangen. */
                         confirmation = Input.replace("confirmation: ", "");
                         toastShort("confirmation: " + confirmation);
-                        if (confirmation == "True") {
+                        if (confirmation.equals("True")) {
                             // TODO Send 'direction' to MBED through USB
-					float[] args = new float[1];
-                            args[0] = Integer.valueOf(direction);
+					        float[] args = new float[1];
+
+                            logComm.append("Direction: " + direction + "\n");
+
+                            if(direction.equals("North")) {
+                                args[0] = 1.0f;
+                            } else if(direction.equals("South")) {
+                                args[0] = 2.0f;
+                            } else if(direction.equals("West")) {
+                                args[0] = 3.0f;
+                            } else if(direction.equals("East")) {
+                                args[0] = 4.0f;
+                            }
+
                             getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-                            currentLocation = UpdateLocation(currentLocation, direction);
+                            //currentLocation = UpdateLocation(currentLocation, direction);
                         }
                     }
                 } else {
