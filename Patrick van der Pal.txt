@@ -1,0 +1,31 @@
+Patrick van der Pal - 6223931
+We hebben de groep in twee kleinere groepjes opgedeeld.
+
+Matthijs, Xander en Daan werken aan de python-applicatie op de Laptop waarop voornamelijk een real-time overzicht van het experiment moet komen.
+Floris, Mike en ik werken voornamelijk aan de communicatie tussen de MBED/Robot, de Mobiele Telefoon aangesloten op de MBED (Slave-App) en de Mobiele Telefoon aangesloten op de Laptop (Master-App). Deze Master-App moet uiteindelijk worden samengevoegd aan de python-applicatie van het andere groepje.
+
+10-06-2014
+Plan van aanpak en een globale werkverdeling opgesteld.
+ - Zie "Planning.txt", 
+
+11-06-2014
+Plan van aanpak voor de Slave-App, waar ik zelf aan werk, gedetailleerder opgezet.
+Hierbij moet ook duidelijker worden hoe de communicatie verloopt tussen de verschillende onderdelen.
+ - Zie "Planning - Laptop.txt", "Planning - MBED.txt" en "Planning - Phone.txt"
+
+12-06-2014
+Begonnen met het behandelen van de gescande QR-code. [Samen met Mike Trieu]
+De verschillende berichten, voornamelijk tussen de Laptop en de Phone, opgezet.
+ - Zie "MainActivity.java"
+
+13-06-2014
+Naar aanleiding van problemen met het ontvangen en versturen van berichten, heb ik het plan van aanpak iets aangepast.
+ - Zie "Planning - Laptop.txt" en "Planning - Phone.txt"
+
+Dit was een korte dag, omdat Edwin per ongeluk de sleutel mee naar huis had genomen, waardoor we geen beschikking hadden over ons materiaal.
+
+16-06-2014
+Vanochtend ben ik naar de tandarts geweest, dus ik was iets later.
+Naar aanleiding van het aanpassen van het plan van aanpak, heb ik de code aangepast. [Samen met Mike Trieu]
+Nu wordt aan de hand van het algoritme de MBED/Robot aangestuurd.
+ - Zie "MainActivity.java"
