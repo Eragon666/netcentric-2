@@ -1,0 +1,36 @@
+Xander Koning - 10439099, BIER persoonlijk logboek
+
+di 10-6:
+
+Vandaag hebben we in de brainstorm sessie ideeen kunnen opdoen voor een project. We hebben gekozen
+voor het aansturen van robotauto's d.m.v. android telefoons. De auto's rijden op een grid die
+bestaat uit QR codes, en de plattegrond moet live op een laptop getoond kunnen worden. De staat van de
+Plattegrond wordt d.m.v. bluetooth communicatie van een van de telefoons naar de laptop gestuurd.
+Ik heb met Matthijs uitgezocht hoe we hiervoor een GUI in Python kunnen maken, en dit gaan we doen met
+Tkinter. Alvast een beginnetje gemaakt hiermee.
+
+wo 11-6:
+
+Bluetooth communicatie uitzoeken. Op internet hebben we niet veel kunnen vinden, samen met Daan heb ik gezocht.
+Uiteindelijk hebben we wel iets kunnen vinden, Daan heeft een Macbook met Bluetooth. Maar ikzelf heb 
+blijkbaar geen Bluetooth op mijn laptop, waardoor we een probleem hadden vandaag. Matthijs heeft
+waarschijnlijk een Bluetooth adapter thuis liggen, dus dan kunnen we hetgeen Daan heeft gevonden, namelijk een
+programmaatje in Processing, uitvoeren op Matthijs zijn laptop. Want de Macbook van Daan kan alleen verbinden
+met Iphones, Apple en Android over Bluetooth gaan niet goed samen. 
+
+do 12-6:
+
+Vandaag ben ik verder gegaan met de tutorial voor Tkinter volgen, dit resulteerde erin dat ik weet hoe een 
+knop in de GUI verbonden kan worden aan een functie. Op deze manier kunnen we het dus bewerkstelligen dat er
+een bluetooth verbinding wordt gemaakt met een telefoon. Overgigens zijn we ook gaan kijken naar andere manieren
+om de telefoon op de laptop aan te sluiten, namelijk via een serial port. Dit, omdat de library voor bluetooth niet
+cross-platform bleek te zijn. Ik heb daarna nog met Daan bij Matthijs, die wat later was
+gekeken naar het verbinden met bluetooth, en aan het eind van de dag hadden we het voor elkaar dat er een bluetooth
+verbinding was met een server in Python op de laptop en de client op de Android telefoon.
+
+vr 13-6:
+
+Vandaag hebben we niet zoveel kunnen doen, aangezien Daan later was en uiteindelijk niet hoefde te komen. Want we waren rond half 1
+alweer weg, Floris, Patrick en Mike konden niet zoveel doen, want de kast met apparatuur was op slot. Wel hebben we het voor elkaar 
+gekregen dat er data van de telefoon, in een byte array, gestuurd kan worden naar de laptop, dus dat is wel mooi.
+Nu moeten we alleen nog het tegenovergestelde voor elkaar krijgen.

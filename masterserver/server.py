@@ -21,8 +21,7 @@ client_sock, client_info = server_sock.accept()
 print("Accepted connection from ", client_info)
 
 try:
-    
-    server_sock.send("je bent zelluf lui!")
+    #server_sock.send("je bent zelluf lui!")
     while True:
         data = client_sock.recv(1024)
         if len(data) == 0: break
