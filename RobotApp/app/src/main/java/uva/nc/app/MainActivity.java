@@ -61,6 +61,9 @@ public class MainActivity extends ServiceActivity {
     private TextView ownAddressText;
     private Button listenerButton;
 
+    private TextView deviceCountText;
+    private Button devicesButton;
+
     // mBed controls.
     private TextView mbedConnectedText;
 
@@ -289,6 +292,17 @@ public class MainActivity extends ServiceActivity {
         ownAddressText = (TextView)findViewById(R.id.own_address);
         listenerStatusText = (TextView)findViewById(R.id.listener_status);
         listenerButton = (Button)findViewById(R.id.listener);
+        deviceCountText = (TextView)findViewById(R.id.device_count);
+        devicesButton = (Button)findViewById(R.id.devices);
+        devicesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent launch = new Intent(MainActivity.this, DevicesActivity.class);
+                startActivity(launch);
+            }
+        });
+
+
         mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
 
         // mBed controls.
@@ -302,12 +316,19 @@ public class MainActivity extends ServiceActivity {
         String ownAddress = "Not available";
         String connected = "0";
         boolean slaveButtonEnabled = false;
+        boolean devicesButtonEnabled = false;
 
         // Well it's not pretty, but it (barely) avoids duplicate logic.
         final BluetoothService bluetooth = getBluetooth();
         if (bluetooth != null) {
             slaveButtonEnabled = true;
+            devicesButtonEnabled = true;
             ownAddress = bluetooth.utility.getOwnAddress();
+
+            int devConnected = bluetooth.master.countConnected();
+            if (bluetooth.master.countConnected() > 0) {
+                connected = String.valueOf(devConnected);
+            }
 
             if (bluetooth.slave.isConnected()) {
                 slaveStatus = "Connected to " + bluetooth.slave.getRemoteDevice();
@@ -346,6 +367,8 @@ public class MainActivity extends ServiceActivity {
         listenerButton.setText(slaveButton);
         listenerButton.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
+        deviceCountText.setText(connected);
+        devicesButton.setEnabled(devicesButtonEnabled);
     }
 
     private void refreshMbedControls() {
@@ -416,7 +439,7 @@ public class MainActivity extends ServiceActivity {
                     final BluetoothService bluetooth = getBluetooth();
                     if(bluetooth != null) {
                         if (bluetooth.slave.isConnected()) {
-                            toastShort("To Master:\n" + QRdata);
+                            logComm.append("To Master: " + QRdata + "\n");
                             bluetooth.slave.sendToMaster("QRdata: " + QRdata);
                         }
                     }
@@ -502,16 +525,16 @@ public class MainActivity extends ServiceActivity {
                 if (obj != null) {
                     String Input = String.valueOf(obj);
 
-                    if(Input.contains("finalDestination: ")) {
+                    if (Input.contains("finalDestination: ")) {
                         /* Hier wordt de finalDestination ontvangen. */
                         finalDestination = Input.replace("finalDestination: ", "");
                         roaming = false;
-                    } else if(Input.contains("currentLocation: ")) {
+                    } else if (Input.contains("currentLocation: ")) {
                         /* Hier wordt de currentLocation ontvangen. */
                         currentLocation = Input.replace("currentLocation: ", "");
 
                         scanText.setText("Current Location: " + currentLocation);
-                        if(roaming)
+                        if (roaming)
                             direction = RandomDirection();
                         else
                             direction = KortstePadSolver(currentLocation, finalDestination);
@@ -534,6 +557,15 @@ public class MainActivity extends ServiceActivity {
                     }
                 } else {
                     toastShort("From master:\nnull");
+                }
+            } else if (action.equals(MasterManager.DEVICE_RECEIVED)) {
+                // Master received data from slave.
+                Serializable obj = intent.getSerializableExtra(MasterManager.EXTRA_OBJECT);
+                BluetoothDevice device = intent.getParcelableExtra(MasterManager.EXTRA_DEVICE);
+                if (obj != null) {
+                    toastShort("From " + device + "\n" + String.valueOf(obj));
+                } else {
+                    toastShort("From " + device + "\nnull!");
                 }
             } else if (action.equals(MbedManager.DATA_READ)) {
 
