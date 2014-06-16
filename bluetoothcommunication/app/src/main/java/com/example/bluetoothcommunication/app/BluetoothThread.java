@@ -12,17 +12,17 @@ import java.io.OutputStream;
  */
 public class BluetoothThread extends Thread {
 
-    private Listener listener;
+    //private Listener listener;
 
     /**
      * Listsner interface
      */
-    public static interface Listener {
-        void onConnected();
-        void onReceived(byte[] buffer, int length);
-        void onDisconnected();
-        void onError(IOException e);
-    }
+//    public static interface Listener {
+//        void onConnected();
+//        void onReceived(byte[] buffer, int length);
+//        void onDisconnected();
+//        void onError(IOException e);
+//    }
 
     private static final int BUFFER_SIZE = 1024;
     private BluetoothSocket socket;
@@ -30,16 +30,16 @@ public class BluetoothThread extends Thread {
     /**
      * Create new instance
      */
-    public static BluetoothThread newInstance(BluetoothSocket socket, Listener listener) {
-        BluetoothThread instance = new BluetoothThread(socket, listener);
+    public static BluetoothThread newInstance(BluetoothSocket socket) {
+        BluetoothThread instance = new BluetoothThread(socket);
         instance.start();
         //instance.run();
         return instance;
     }
 
-    protected BluetoothThread(BluetoothSocket socket, Listener listener) {
+    protected BluetoothThread(BluetoothSocket socket) {
         this.socket = socket;
-        this.listener = listener;
+        //this.listener = listener;
     }
 
     public void run() {

@@ -1,6 +1,7 @@
 package com.example.bluetoothcommunication.app;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -28,7 +29,8 @@ public class MainActivity extends Activity {
     private BluetoothAdapter BA;
     private Set<BluetoothDevice> pairedDevices;
     private ListView lv;
-    private BluetoothThread.Listener listener;
+    private BluetoothThread connection;
+    //private BluetoothThread.Listener listener;
 
     BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().
             getRemoteDevice(deviceAddress);
@@ -62,20 +64,21 @@ public class MainActivity extends Activity {
             Log.e("Masterserver", "Error" + e);
         }
 
-        BluetoothThread.newInstance(socket, listener);
+        connection = BluetoothThread.newInstance(socket);
+
 
     }
 
     public void on(View view){
-        if (!BA.isEnabled()) {
-            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(turnOn, 0);
-            Toast.makeText(getApplicationContext(),"Turned on"
-                    ,Toast.LENGTH_LONG).show();
-        }
-        else{
-            Toast.makeText(getApplicationContext(),"Already on",
-                    Toast.LENGTH_LONG).show();
+        String string = "Daan is lui";
+
+        byte[] b = string.getBytes();
+        b = string.getBytes(Charset.forName("UTF-8"));
+
+        try {
+            connection.write(b);
+        } catch (IOException e) {
+            Log.e("Masterserver", "Error with write");
         }
     }
     public void list(View view){
@@ -103,12 +106,20 @@ public class MainActivity extends Activity {
         startActivityForResult(getVisible, 0);
 
     }
-    @Override
+
+    public void visible(View view) {
+        Intent getVisible = new Intent(BluetoothAdapter.
+                ACTION_REQUEST_DISCOVERABLE);
+        startActivityForResult(getVisible, 0);
+
+    }
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
 
 }
 
