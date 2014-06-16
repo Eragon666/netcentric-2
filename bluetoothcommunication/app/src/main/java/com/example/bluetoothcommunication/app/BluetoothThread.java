@@ -33,7 +33,7 @@ public class BluetoothThread extends Thread {
     public static BluetoothThread newInstance(BluetoothSocket socket) {
         BluetoothThread instance = new BluetoothThread(socket);
         instance.start();
-        //instance.run();
+        instance.run();
         return instance;
     }
 
