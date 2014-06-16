@@ -17,29 +17,30 @@ public class BluetoothThread extends Thread {
     /**
      * Listsner interface
      */
-//    public static interface Listener {
-//        void onConnected();
-//        void onReceived(byte[] buffer, int length);
-//        void onDisconnected();
-//        void onError(IOException e);
-//    }
+    public static interface Listener {
+        void onConnected();
+        void onReceived(byte[] buffer, int length);
+        void onDisconnected();
+        void onError(IOException e);
+    }
 
     private static final int BUFFER_SIZE = 1024;
     private BluetoothSocket socket;
+    private Listener listener;
 
     /**
      * Create new instance
      */
-    public static BluetoothThread newInstance(BluetoothSocket socket) {
-        BluetoothThread instance = new BluetoothThread(socket);
+    public static BluetoothThread newInstance(BluetoothSocket socket, Listener listener) {
+        BluetoothThread instance = new BluetoothThread(socket, listener);
         instance.start();
         //instance.run();
         return instance;
     }
 
-    protected BluetoothThread(BluetoothSocket socket) {
+    protected BluetoothThread(BluetoothSocket socket, Listener listener) {
         this.socket = socket;
-        //this.listener = listener;
+        this.listener = listener;
     }
 
     public void run() {
@@ -52,7 +53,7 @@ public class BluetoothThread extends Thread {
             try {
                 cancel();
             } catch (IOException e) { }
-            //listener.onError(connectException);
+            listener.onError(connectException);
             return;
         }
 
@@ -72,7 +73,7 @@ public class BluetoothThread extends Thread {
             inputStream = socket.getInputStream();
             outputStream = new BufferedOutputStream(socket.getOutputStream());
 
-            //listener.onConnected();
+            listener.onConnected();
 
             // Keep listening to the InputStream until an exception occurs
             while (true) {
@@ -86,7 +87,7 @@ public class BluetoothThread extends Thread {
                 // check if reading is done
                 if (curLength > 0) {
                     // reading finished
-                    //listener.onReceived(buffer, curLength);
+                    listener.onReceived(buffer, curLength);
                     curLength = bytes = 0;
                 }
             }
@@ -94,7 +95,7 @@ public class BluetoothThread extends Thread {
             if (isClosing)
                 return;
 
-            //listener.onError(e);
+            listener.onError(e);
             throw new RuntimeException(e);
         }
     }
@@ -113,7 +114,7 @@ public class BluetoothThread extends Thread {
     public void cancel() throws IOException {
         isClosing = true;
         socket.close();
-        //listener.onDisconnected();
+        listener.onDisconnected();
 
         inputStream = null;
         outputStream = null;
