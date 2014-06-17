@@ -141,6 +141,7 @@ public class MainActivity extends Activity {
             Log.i("Masterserver", "received message with length" + length);
             // copy to string
             final String stringData = new String(buffer, 0, length);
+            Log.i("Masterserver", "received message = " + stringData);
             runOnUiThread(new Runnable() {
                 public void run() {
                 }
