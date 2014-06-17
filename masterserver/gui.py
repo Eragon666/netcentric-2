@@ -1,6 +1,7 @@
 
 import Tkinter as tk
 from Tkinter import *
+from bluetooth import *
 import tkMessageBox
 import random
 
@@ -10,12 +11,43 @@ canvas_height = 700
 x = 10
 y = 10
 
+#Listen to bluetooth connection boolean
+listen = 0;
+
+server_sock=BluetoothSocket(RFCOMM)
+server_sock.bind(("",PORT_ANY))
+server_sock.listen(1)
+
+port = server_sock.getsockname()[1]
+
+uuid = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
+
+advertise_service( server_sock, "SampleServer",
+                    service_id = uuid,
+                    service_classes = [ uuid, SERIAL_PORT_CLASS ],
+                    profiles = [ SERIAL_PORT_PROFILE ],
+#                   protocols = [ OBEX_UUID ] 
+                    )
+
+
+
+def listenBluetooth():
+    try:
+        data = client_sock.recv(1024)
+        if len(data) == 0: pass
+        print("received [%s]" % data)
+    except IOError:
+        pass
+
 def handler():
 	if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
 		root.quit()
 
 def connect():
-	print "connecting..."
+    print "Waiting for connection"
+    client_sock, client_info = server_sock.accept()
+    print("Accepted connection from ", client_info)
+    listen = 1;     
 
 def draw(self,x,y,size):
     	drawQR(self,x,y,size)
@@ -83,7 +115,15 @@ if __name__== '__main__':
     gui=Gui(root)
     root.protocol("WM_DELETE_WINDOW", handler)
     root.mainloop()
+    while True:
+        if (listen):
+            listenBluetooth()
+        
+    print("disconnected");
 
+    client_sock.close()
+    server_sock.close()
+    print("all done")
 
 
 
