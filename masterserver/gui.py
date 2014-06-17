@@ -91,11 +91,9 @@ class Gui():
         frame.grid(row=0,column=0, sticky="n")
         label1=Label(frame, text="Grid size").grid(row=0,column=0, sticky="nw")
         label2=Label(frame, text="X").grid(row=1,column=0, sticky="w")
-        label3=Label(frame, text="Y").grid(row=2,column=0, sticky="w")
         # self.option.grid(row=0,column=1,sticky="nwe")
-        entryX = Entry(frame).grid(row = 1,column = 1,sticky = E+ W)
-        entryY = Entry(frame).grid(row = 2,column = 1, sticky = E)
-
+        e = Entry(root).grid(row = 1,column = 1,sticky = E+ W)
+        e.get(0, "a default value")
         Button1=Button(frame,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
 
         for i in range(x):

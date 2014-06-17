@@ -36,3 +36,4 @@ De demo alvast voorbereiden. De demo zal bestaan uit twee delen. [Samen met Mike
 2. Laten zien dat we posities kunnen afschermen. Dit om botsingen te voorkomen.
 
 Voorlopig moet alleen de MBED/Robot hiervoor gecalibreerd worden.
+De calibratie is niet nauwkeurig genoeg waardoor we na overleg met Edwin besloten om voorlopig geen tijd meer te besteden aan de calibratie.
