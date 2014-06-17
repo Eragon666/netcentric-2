@@ -25,6 +25,7 @@ public class BluetoothThread extends Thread {
         void onReceived(byte[] buffer, int length);
         void onDisconnected();
         void onError(IOException e);
+        void onMessage(String message);
     }
 
     private static final int BUFFER_SIZE = 1024;

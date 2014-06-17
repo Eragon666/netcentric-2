@@ -22,7 +22,8 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    private String deviceAddress = "00:09:DD:50:8D:2A";
+    //private String deviceAddress = "00:09:DD:50:8D:2A";
+    private String deviceAddress = "00:15:83:15:A3:10";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
     private Button On, Off, Visible, list;
@@ -142,9 +143,12 @@ public class MainActivity extends Activity {
             final String stringData = new String(buffer, 0, length);
             runOnUiThread(new Runnable() {
                 public void run() {
-                    //onReceivedString(stringData);
                 }
             });
+        }
+
+        public void onMessage(String message) {
+            Log.i("Masterserver", "Message: " + message);
         }
     };
 
