@@ -29,3 +29,10 @@ Vanochtend ben ik naar de tandarts geweest, dus ik was iets later.
 Naar aanleiding van het aanpassen van het plan van aanpak, heb ik de code aangepast. [Samen met Mike Trieu]
 Nu wordt aan de hand van het algoritme de MBED/Robot aangestuurd.
  - Zie "MainActivity.java"
+
+17-06-2014
+De demo alvast voorbereiden. De demo zal bestaan uit twee delen. [Samen met Mike Trieu en Floris Turkenburg]
+1. Willekeurig rondrijden door een 3x3 veld.
+2. Laten zien dat we posities kunnen afschermen. Dit om botsingen te voorkomen.
+
+Voorlopig moet alleen de MBED/Robot hiervoor gecalibreerd worden.
