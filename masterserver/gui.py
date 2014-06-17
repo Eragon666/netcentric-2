@@ -1,4 +1,4 @@
-
+from threading import Thread
 import Tkinter as tk
 from Tkinter import *
 from bluetooth import *
@@ -13,6 +13,9 @@ y = 10
 
 #Listen to bluetooth connection boolean
 listen = 0;
+
+#To store the multiple threads in
+threads = []
 
 server_sock=BluetoothSocket(RFCOMM)
 server_sock.bind(("",PORT_ANY))
@@ -32,12 +35,22 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
-    try:
-        data = client_sock.recv(1024)
-        if len(data) == 0: pass
-        print("received [%s]" % data)
-    except IOError:
-        pass
+    while True:
+        if (listen):
+            try:
+                data = client_sock.recv(1024)
+                if len(data) == 0: pass
+                print("received [%s]" % data)
+            except IOError:
+                pass
+
+def guiMain():
+    root=tk.Tk()
+    root.resizable(width=FALSE, height=FALSE)
+    gui=Gui(root)
+    root.protocol("WM_DELETE_WINDOW", handler)
+    root.mainloop()
+    print("disconnected");
 
 def handler():
 	if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
@@ -108,21 +121,17 @@ class Gui():
 
 
 if __name__== '__main__':
-    root=tk.Tk()
-    root.resizable(width=FALSE, height=FALSE)
-    gui=Gui(root)
-    root.protocol("WM_DELETE_WINDOW", handler)
-    root.mainloop()
-    while True:
-        if (listen):
-            listenBluetooth()
-        
-    print("disconnected");
+    thread = Thread(target = listenBluetooth)
+    thread.start()
+    threads.append(thread)
+    
+    thread1 = Thread(target = guiMain)
+    thread1.start()
+    threads.append(thread1)
+    
+    for thread in threads:
+        thread.join()
 
     client_sock.close()
     server_sock.close()
     print("all done")
-
-
-
-
