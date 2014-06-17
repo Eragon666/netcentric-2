@@ -52,4 +52,5 @@ Netcentric Computing - Labreport Week 2-4
 - QR codes gemaakt
 
 17/6/2014
-- 
+- Robot calibreren [met Floris, Patrick]
+- QR codes testen, random beweging testen [met Patrick]
