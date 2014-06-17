@@ -7,8 +7,8 @@ import random
 canvas_width = 700
 canvas_height = 700
 
-x = 20
-y = 20
+x = 10
+y = 10
 
 def handler():
 	if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
@@ -21,7 +21,7 @@ def draw(self,x,y,size):
     	drawQR(self,x,y,size)
 
 def drawQR(self,x,y,size):
-		dsize = size/5
+		dsize = size/4
 		nextx = x
 		nexty = y
 		for i in range(4):
@@ -34,6 +34,15 @@ def drawQR(self,x,y,size):
 				nexty = nexty+dsize
 		 		figure=self.canvas.create_rectangle(nextx,nexty,nextx+dsize,nexty+dsize, fill=color)
 		 	nexty = y
+
+def drawRobot(self,x,y,size,direction,xco,yco):
+	x *= xco
+	y *= yco
+	x += size/8
+	y+= size/8
+	figure=self.canvas.create_rectangle(x,y,x+size/4,y+size/4, fill="yellow")
+
+
 
 
 class Gui():
@@ -63,7 +72,8 @@ class Gui():
         		dy = canvas_height/y
         		draw(self,dx*i,dy*j,dx/2)
         # Grid.columnconfigure(self.root,1,weight=1, size=200)
-
+        drawRobot(self,dx,dy,50,1,1,2)
+        drawRobot(self,dx,dy,50,1,5,4)
 
 
 
