@@ -23,6 +23,8 @@ import android.content.pm.ActivityInfo;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.Math;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.UUID;
 
 import uva.nc.ServiceActivity;
@@ -418,6 +420,10 @@ public class MainActivity extends ServiceActivity {
     }
 
     private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
+        String currentLocation = "[0, 0]";
+        String direction = "None";
+        String confirmation = "False";
+
         public void onConnected() {
             Log.i("Masterserver", "Connected bluetooth 12");
             MainActivity.this.runOnUiThread(new Runnable() {
@@ -443,8 +449,21 @@ public class MainActivity extends ServiceActivity {
         public void onReceived(byte[] buffer, int length) {
             Log.i("Masterserver", "received message with length" + length);
             // copy to string
-            final String stringData = new String(buffer, 0, length);
-            Log.i("Masterserver", "received message = " + stringData);
+            final String Input = new String(buffer, 0, length);
+            Log.i("Masterserver", "received message = " + Input);
+            if (Input.contains("QRdata: ")) {
+                String QRdata = Input.replace("QRdata: ", "");
+                currentLocation = QRdata.replace("Locatie: ", "");
+                SendMessage("currentLocation: " + currentLocation);
+            } else if (Input.contains("direction: ")) {
+                direction = Input.replace("direction: ", "");
+                confirmation = Confirm(currentLocation, direction);
+                if (confirmation.equals("True")) {
+                    SendMessage("confirmation: " + confirmation);
+                } else {
+                    SendMessage("currentLocation" + currentLocation);
+                }
+            }
             runOnUiThread(new Runnable() {
                 public void run() {
                 }
@@ -453,6 +472,46 @@ public class MainActivity extends ServiceActivity {
 
         public void onMessage(String message) {
             Log.i("Masterserver", "Message: " + message);
+        }
+
+        String[] ReservedLocations = {"[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"};
+        //ReservedLocations[3] = "[1, 2]";
+
+        public String Confirm(String currentLocation, String direction) {
+            /* Also needs a global array with all the reserved locations.
+             * Currently named: 'ReservedLocations' */
+            // Initialize 'newPosition' based on parameters.
+            String newPosition = "";
+            String test = currentLocation.replace("Locatie: ", "");
+            Log.e("Within Confirm", "currentLocation: " + test);
+            Log.e("Within Confirm", "direction: " + direction);
+            int currentX = Integer.valueOf(String.valueOf(test.charAt(1)));
+            int currentY = Integer.valueOf(String.valueOf(test.charAt(4)));
+            if (direction.equals("North"))
+                newPosition = "[" + currentX + ", " + (currentY + 1) + "]";
+            else if (direction.equals("East"))
+                newPosition = "[" + (currentX + 1) + ", " + currentY + "]";
+            else if (direction.equals("South"))
+                newPosition = "[" + currentX + ", " + (currentY - 1) + "]";
+            else if (direction.equals("West"))
+                newPosition = "[" + (currentX - 1) + ", " + currentY + "]";
+            Log.e("Within Confirm", "newPosition: " + newPosition);
+            if(Arrays.asList(ReservedLocations).contains(newPosition)) {
+                return "False";
+            }
+            return "True";
+        }
+
+        // Dit is de voorbeeldcode van Matthijs om een bericht te versturen.
+        public void SendMessage(String Message) {
+            byte[] b = Message.getBytes(Charset.forName("UTF-8"));
+
+            try {
+                connection.write(b);
+                toastShort("Sent to laptop\n");
+            } catch (IOException e) {
+                Log.e("Masterserver", "Error with write");
+            }
         }
     };
 
@@ -502,6 +561,17 @@ public class MainActivity extends ServiceActivity {
     };
 
     PreviewCallback previewCb = new PreviewCallback() {
+        public void SendMessage(String Message) {
+            byte[] b = Message.getBytes(Charset.forName("UTF-8"));
+
+            try {
+                connection.write(b);
+                toastShort("Sent to laptop\n");
+            } catch (IOException e) {
+                Log.e("Masterserver", "Error with write");
+            }
+        }
+
         public void onPreviewFrame(byte[] data, Camera camera) {
             /* Hier wordt de QR-code gescand, maar dit moet dus verplaatst
                worden naar de plek waar MBED-signalen worden ontvangen. */
@@ -527,6 +597,7 @@ public class MainActivity extends ServiceActivity {
                         if (bluetooth.slave.isConnected()) {
                             logComm.append("To Master: " + QRdata + "\n");
                             bluetooth.slave.sendToMaster("QRdata: " + QRdata);
+                            SendMessage("QRdata: " + QRdata);
                         }
                     }
                     logComm.append("Scanned:"+ QRdata + "\n");

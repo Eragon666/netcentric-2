@@ -23,11 +23,12 @@
                 android:layout_height="wrap_content"
                 android:text="Show Camera Preview"
                 android:id="@+id/show_camera_layout"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:orientation="vertical"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:id="@+id/camera_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
