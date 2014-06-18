@@ -35,6 +35,7 @@ Netcentric Computing - Labreport Week 2-4
 
 12/6/2014
 - Layout van robotApp is verbeterd. Onderdelen van de app is opgesplitst voor overzichtelijkheid
+  Gekozen voor knoppen die bepaalde onderdelen verbergen in plaats van tablayout
 - Tijdelijke knoppen gemaakt in robotApp om de besturing en communicatie te testen
 - Calibreren van robot. Dit is nog niet goed gelukt, omdat de kabels zitten in de weg. [met Floris]
 - QR scanner wordt actief wanneer robot klaar is met bewegen.
@@ -48,4 +49,8 @@ Netcentric Computing - Labreport Week 2-4
 16/6/2014
 - Omnibot wireless maken [met Floris]
 - Omnibot automatisch laten rijden na scannen van QR code [met Patrick]
-- 
+- QR codes gemaakt
+
+17/6/2014
+- Robot calibreren [met Floris, Patrick]
+- QR codes testen, random beweging testen [met Patrick]
