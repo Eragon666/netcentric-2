@@ -49,6 +49,18 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 import net.sourceforge.zbar.Config;
 
+//Example send message
+//String string = "Test bericht";
+//
+//        byte[] b = string.getBytes();
+//        b = string.getBytes(Charset.forName("UTF-8"));
+//
+//        try {
+//        connection.write(b);
+//        } catch (IOException e) {
+//        Log.e("Masterserver", "Error with write");
+//        }
+
 
 public class MainActivity extends ServiceActivity {
     private static final String TAG = MainActivity.class.getName();
@@ -102,8 +114,12 @@ public class MainActivity extends ServiceActivity {
     private boolean previewing = true;
 
     // Initialize variables for bluetooth connection
-    private String deviceAddress = "00:15:83:15:A3:10";
+    private String deviceAddress = "00:09:DD:50:8D:2A";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
+
+    //Device address Matthijs: "00:15:83:15:A3:10";
+    //Device address Xander: 00:09:DD:50:8D:2A
+    //Device address Patrick:
 
     private BluetoothAdapter BA;
     private BluetoothThread connection;
@@ -380,6 +396,7 @@ public class MainActivity extends ServiceActivity {
                         try {
                             Log.i("Masterserver", "Connected");
                             socket = device.createRfcommSocketToServiceRecord(MY_UUID);
+
 
                             //socket.connect();
                         } catch (IOException e) {
