@@ -368,8 +368,8 @@ public class MainActivity extends ServiceActivity {
                     }
                 });
             } else {
-                slaveStatus = "Not listening";
-                slaveButton = "Start listening";
+                slaveStatus = "Master connecting";
+                slaveButton = "Connect to master";
                 listenerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -382,7 +382,6 @@ public class MainActivity extends ServiceActivity {
                             socket = device.createRfcommSocketToServiceRecord(MY_UUID);
 
                             //socket.connect();
-
                         } catch (IOException e) {
                             Log.e("Masterserver", "Error" + e);
                         }
