@@ -2,7 +2,9 @@ package uva.nc.app;
 
 import uva.nc.app.CameraPreview;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,8 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.pm.ActivityInfo;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.Math;
+import java.util.UUID;
 
 import uva.nc.ServiceActivity;
 import uva.nc.bluetooth.BluetoothService;
@@ -30,7 +34,6 @@ import uva.nc.mbed.MbedRequest;
 import uva.nc.mbed.MbedResponse;
 import uva.nc.mbed.MbedService;
 
-import android.graphics.ImageFormat;
 import android.widget.FrameLayout;
 import android.view.View.OnClickListener;
 
@@ -98,6 +101,17 @@ public class MainActivity extends ServiceActivity {
     private boolean barcodeScanned = false;
     private boolean previewing = true;
 
+    // Initialize variables for bluetooth connection
+    private String deviceAddress = "00:15:83:15:A3:10";
+    private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
+
+    private BluetoothAdapter BA;
+    private BluetoothThread connection;
+
+    BluetoothDevice device;
+
+    BluetoothSocket socket;
+
     // Load QR scanner library
     static {
         System.loadLibrary("iconv");
@@ -112,6 +126,11 @@ public class MainActivity extends ServiceActivity {
 
         // Attach logging TextView
         logComm = (TextView)findViewById(R.id.log_comm);
+
+        //Bluetooth initialize
+        device = BluetoothAdapter.getDefaultAdapter().
+                getRemoteDevice(deviceAddress);
+
 
         /***
          * Attach layout buttons
@@ -354,10 +373,21 @@ public class MainActivity extends ServiceActivity {
                 listenerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (!bluetooth.utility.isDiscoverable()) {
-                            bluetooth.utility.setDiscoverable();
+//                        if (!bluetooth.utility.isDiscoverable()) {
+//                            bluetooth.utility.setDiscoverable();
+//                        }
+
+                        try {
+                            Log.i("Masterserver", "Connected");
+                            socket = device.createRfcommSocketToServiceRecord(MY_UUID);
+
+                            //socket.connect();
+
+                        } catch (IOException e) {
+                            Log.e("Masterserver", "Error" + e);
                         }
-                        bluetooth.slave.startAcceptOne();
+
+                        connection = BluetoothThread.newInstance(socket, bluetoothListener);
                     }
                 });
             }
@@ -370,6 +400,46 @@ public class MainActivity extends ServiceActivity {
         deviceCountText.setText(connected);
         devicesButton.setEnabled(devicesButtonEnabled);
     }
+
+    private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
+        public void onConnected() {
+            Log.i("Masterserver", "Connected bluetooth 12");
+            MainActivity.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    Log.i("Masterserver", "Connected bluetooth");
+                    //MainActivity.this.onConnected(true);
+                }
+            });
+        }
+
+        public void onDisconnected() {
+            Log.i("Masterserver", "disConnected bluetooth");
+            MainActivity.this.runOnUiThread(new Runnable() {
+                public void run() {
+                    //MainActivity.this.onConnected(false);
+                }
+            });
+        }
+
+        public void onError(IOException e) {
+        }
+
+        public void onReceived(byte[] buffer, int length) {
+            Log.i("Masterserver", "received message with length" + length);
+            // copy to string
+            final String stringData = new String(buffer, 0, length);
+            Log.i("Masterserver", "received message = " + stringData);
+            runOnUiThread(new Runnable() {
+                public void run() {
+                }
+            });
+        }
+
+        public void onMessage(String message) {
+            Log.i("Masterserver", "Message: " + message);
+        }
+    };
+
 
     private void refreshMbedControls() {
         String connText = getString(R.string.not_connected); // if you want to localize
