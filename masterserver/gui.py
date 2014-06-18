@@ -5,14 +5,14 @@ from bluetooth import *
 import tkMessageBox
 import random
 
-canvas_width = 700
-canvas_height = 700
+canvas_width = 600
+canvas_height = 600
 
 x = 10
 y = 10
 
 #Listen to bluetooth connection boolean
-listen = 0;
+listen = 1;
 
 #To store the multiple threads in
 threads = []
@@ -35,6 +35,9 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
+    print "Waiting for connection"
+    client_sock, client_info = server_sock.accept()
+    print("Accepted connection from ", client_info)
     while True:
         if (listen):
             try:
@@ -48,13 +51,11 @@ def guiMain():
     root=tk.Tk()
     root.resizable(width=FALSE, height=FALSE)
     gui=Gui(root)
-    root.protocol("WM_DELETE_WINDOW", handler)
+    root.protocol("WM_DELETE_WINDOW", Gui.handler)
     root.mainloop()
     print("disconnected");
 
-def handler():
-	if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
-		root.quit()
+
 
 def connect():
     print "Waiting for connection"
@@ -100,14 +101,16 @@ class Gui():
         self.canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
         self.canvas.grid(row=0,column=1,padx=10)
 
-        frame = Frame(self.root)
-        frame.grid(row=0,column=0, sticky="n")
-        label1=Label(frame, text="Grid size").grid(row=0,column=0, sticky="nw")
-        label2=Label(frame, text="X").grid(row=1,column=0, sticky="w")
+        #frame = Frame(self.root)
+        #frame.grid(row=0,column=0, sticky="n")
+        label1=Label(self.root, text="Grid size").grid(row=0,column=0, sticky="nw")
+        label2=Label(self.root, text="X").grid(row=1,column=0, sticky="w")
         # self.option.grid(row=0,column=1,sticky="nwe")
-        e = Entry(root).grid(row = 1,column = 1,sticky = E+ W)
-        e.get(0, "a default value")
-        Button1=Button(frame,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
+        e = Entry(self.root)
+        e.grid(row = 1,column = 1,sticky = E+ W)
+        text = e.get()
+        print text
+        Button1=Button(self.root,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
 
         for i in range(x):
         	for j in range(y):
@@ -118,7 +121,12 @@ class Gui():
         drawRobot(self,dx,dy,50,1,1,2)
         drawRobot(self,dx,dy,50,1,5,4)
 
-
+    def handler():
+        if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
+            client_sock.close()
+            server_sock.close()
+            print("vamos a la playa")
+            root.quit()
 
 if __name__== '__main__':
     thread = Thread(target = listenBluetooth)
@@ -131,7 +139,3 @@ if __name__== '__main__':
     
     for thread in threads:
         thread.join()
-
-    client_sock.close()
-    server_sock.close()
-    print("all done")
