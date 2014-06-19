@@ -53,6 +53,34 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
+    currentLocation = "[0, 0]"
+    direction = "None"
+    confirmation = "False"
+
+    ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
+
+    def Confirm(currentLocation, direction):
+        # Also needs a global array with all the reserved locations.
+        # Currently named: 'ReservedLocations' */
+        # Initialize 'newPosition' based on parameters.
+        newPostion = ""
+        test = currentLocation.replace("Locatie: ", "")
+        currentX = int(test[1])
+        currentY = int(test[4])
+        if direction == "North":
+            newPosition = "[" + str(currentX) + ", " + str(currentY + 1) + "]"
+        elif direction == "East":
+            newPosition = "[" + str(currentX + 1) + ", " + str(currentY) + "]"
+        elif direction == "South":
+            newPosition = "[" + str(currentX) + ", " + str(currentY - 1) + "]"
+        elif direction == "West":
+            newPosition = "[" + str(currentX - 1) + ", " + str(currentY) + "]"
+            
+        if newPosition in ReservedLocations:
+            return "False"
+        
+        return "True"
+    
     global root
     print "Waiting for connection"
     global quit
@@ -73,8 +101,17 @@ def listenBluetooth():
                 if len(data) == 0:
                     pass
                 else:
-                    client_sock.send("currentLocation: [1, 1]")
-                    parser(data)
+                    if "QRdata: " in data:
+                        QRdata = data.replace("QRdata: ", "")
+                        currentLocation = QRdata.replace("Locatie: ", "").replace("; Robot-ID: 21;", "")
+                        client_sock.send("currentLocation: " + currentLocation)
+                    elif "direction: " in data:
+                        direction = data.replace("direction: ", "")
+                        confirmation = Confirm(currentLocation, direction)
+                        if confirmation =="True":
+                            client_sock.send("confirmation: " + confirmation)
+                        else:
+                            client_sock.send("currentLocation: " + currentLocation)
                     gui()
                 print("received [%s]" % data)
             except IOError:
