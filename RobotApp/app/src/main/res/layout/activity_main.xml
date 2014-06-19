@@ -23,8 +23,7 @@
                 android:layout_height="wrap_content"
                 android:text="Show Camera Preview"
                 android:id="@+id/show_camera_layout"
-                android:layout_gravity="center_horizontal"
-                android:visibility="gone" />
+                android:layout_gravity="center_horizontal" />
 
             <LinearLayout
                 android:orientation="vertical"
@@ -63,7 +62,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/mbed_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,7 +84,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/mbed_connected"
                     android:text="@string/not_connected" />
-
+                <!---
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -134,6 +133,7 @@
                         android:enabled="false"
                         android:layout_weight="1" />
                 </LinearLayout>
+                -->
 
                 <TextView
                     android:layout_width="wrap_content"

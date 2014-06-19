@@ -54,3 +54,6 @@ Netcentric Computing - Labreport Week 2-4
 17/6/2014
 - Robot calibreren [met Floris, Patrick]
 - QR codes testen, random beweging testen [met Patrick]
+
+18/6/2014
+- Calibreren

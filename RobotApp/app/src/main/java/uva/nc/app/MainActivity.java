@@ -329,6 +329,7 @@ public class MainActivity extends ServiceActivity {
         ownAddressText = (TextView)findViewById(R.id.own_address);
         listenerStatusText = (TextView)findViewById(R.id.listener_status);
         listenerButton = (Button)findViewById(R.id.listener);
+        /* TODO remove this later
         deviceCountText = (TextView)findViewById(R.id.device_count);
         devicesButton = (Button)findViewById(R.id.devices);
         devicesButton.setOnClickListener(new View.OnClickListener() {
@@ -338,7 +339,7 @@ public class MainActivity extends ServiceActivity {
                 startActivity(launch);
             }
         });
-
+        */
 
         mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
 
