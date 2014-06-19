@@ -1,0 +1,29 @@
+Persoonlijk logboek Daan de Graaf(10360093)
+
+Woensdag 11-6:
+
+- Gui programmeren
+- Gebruik van Processing, goed voor visualisatie en mijn kennis ervan. Tevens is het crossplatform.
+- Bluetooth connectie naar telefoon voor communicatie (dit werkte niet vanwege de bluetooth van mijn mac)
+
+Donderdag 12-6:
+
+- Gebruik van serialport om met een usb aangesloten device te communiceren die als bluetooth adapter werkt.
+- Het geheel blijft zo crossplatform
+
+Om het geheel toch crossplatform te houden, kozen xander en ik ervoor om via usb contact te maken met de telefoon en vervolgens de telefoon te gebruiken als bluetooth ontvanger. Ook dit deden we met processing omdat je android apps kon maken. Maar ook hier kwamen we beiden niet verder dan het installeren van android packages voor processing. 
+Toen kwam matthijs met een usb adapter en die maakte bluetooth verbinding via python op linux. Helaas kunnen we alleen zijn laptop hiervoor gebruiken, want pybluez is niet voor mac.
+
+Vrijdag 13-6:
+
+
+
+Maandag 16-6:
+
+Vandaag ben ik begonnen met de GUI, dit doen we met python met Tkinter. Eerst moest ik even inkomen, maar al gauw heb ik het onder de knie.
+
+Dinsdag 17-6:
+
+Vandaag gaan we verder met de GUI en eventueel proberen wat bij elkaar te voegen voor het te onoverzichtelijk word.
+
+Woensdag 18-6
