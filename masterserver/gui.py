@@ -5,6 +5,7 @@ from bluetooth import *
 import tkMessageBox
 import random
 from time import *
+import re
 
 canvas_width = 600
 canvas_height = 600
@@ -12,8 +13,12 @@ canvas_height = 600
 x = 3
 y = 3
 
+global robotX
 robotX = 0
+global robotY
 robotY = 0
+global ID
+ID = 0
 
 #Listen to bluetooth connection boolean
 listen = 1;
@@ -69,7 +74,7 @@ def listenBluetooth():
                     pass
                 else:
                     client_sock.send("currentLocation: [1, 1]")
-                    robotX = 1
+                    parser(data)
                     gui()
                 print("received [%s]" % data)
             except IOError:
@@ -79,7 +84,7 @@ def guiMain():
     global root
     gui()
     #root.protocol("WM_DELETE_WINDOW", gui.handler)
-    #root.mainloop()
+    root.mainloop()
     print("disconnected");
 
 def exitGui():
@@ -155,7 +160,7 @@ def gui():
 
     drawRobot(dx,dy,300,1,robotX,robotY,canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
-    root.mainloop()
+    #root.mainloop()
 
 def handler(self):
     if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
@@ -169,8 +174,14 @@ def handler(self):
         self.root.quit()
         print "3"
         
-def parser(self, data):
-    drawRobot(self,20,20,300,1,1,1)
+def parser(data):
+    global robotX, robotY, ID
+    extract = re.findall(r'\d+',data)
+    print extract
+    robotX = int(extract[0])
+    robotY = int(extract[1])
+    ID = int(extract[2])
+    #Locatie: [1, 1]; Robot-ID: 21;
         
 if __name__== '__main__':
     global quit
