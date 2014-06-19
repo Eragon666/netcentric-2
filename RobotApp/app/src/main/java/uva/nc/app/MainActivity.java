@@ -78,8 +78,10 @@ public class MainActivity extends ServiceActivity {
     private TextView ownAddressText;
     private Button listenerButton;
 
+    /* TODO remove later
     private TextView deviceCountText;
     private Button devicesButton;
+    */
 
     // mBed controls.
     private TextView mbedConnectedText;
@@ -121,7 +123,7 @@ public class MainActivity extends ServiceActivity {
 
     //Device address Matthijs: "00:15:83:15:A3:10";
     //Device address Xander: 00:09:DD:50:8D:2A
-    //Device address Patrick:
+    //Device address Patrick: A4:17:31:ED:18:F8
 
     private BluetoothAdapter BA;
     private BluetoothThread connection;
@@ -416,14 +418,18 @@ public class MainActivity extends ServiceActivity {
         listenerButton.setText(slaveButton);
         listenerButton.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
+        /* TODO remove later
         deviceCountText.setText(connected);
         devicesButton.setEnabled(devicesButtonEnabled);
+        */
     }
 
     private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
         String currentLocation = "[0, 0]";
+        String finalDestination = "[0, 0]";
         String direction = "None";
         String confirmation = "False";
+        boolean roaming = true;
 
         public void onConnected() {
             Log.i("Masterserver", "Connected bluetooth 12");
@@ -449,6 +455,53 @@ public class MainActivity extends ServiceActivity {
 
         public void onReceived(byte[] buffer, int length) {
             Log.i("Masterserver", "received message with length" + length);
+            final String Input = new String(buffer, 0, length);
+            Log.i("Masterserver", "received message = " + Input);
+
+            if (Input.contains("finalDestination: ")) {
+                        /* Hier wordt de finalDestination ontvangen. */
+                finalDestination = Input.replace("finalDestination: ", "");
+                roaming = false;
+            } else if (Input.contains("currentLocation: ")) {
+                        /* Hier wordt de currentLocation ontvangen. */
+                currentLocation = Input.replace("currentLocation: ", "");
+                Log.i("Masterserver", "currenLocation: " + currentLocation);
+                //scanText.setText("Current Location: " + currentLocation);
+                if (roaming) {
+                    direction = RandomDirection();
+                    Log.i("Masterserver", "RandomDirection");
+                } else {
+                    direction = KortstePadSolver(currentLocation, finalDestination);
+                    Log.i("Masterserver", "KorstePadSolver");
+                }
+                SendMessage("direction: " + direction);
+            } else if (Input.contains("confirmation: ")) {
+                        /* Hier wordt de confirmation ontvangen. */
+                confirmation = Input.replace("confirmation: ", "");
+                toastShort("confirmation: " + confirmation);
+                if (confirmation.equals("True")) {
+                    // TODO Send 'direction' to MBED through USB
+                    float[] args = new float[1];
+
+                    logComm.append("Direction: " + direction + "\n");
+
+                    if(direction.equals("North")) {
+                        args[0] = 1.0f;
+                    } else if(direction.equals("South")) {
+                        args[0] = 2.0f;
+                    } else if(direction.equals("West")) {
+                        args[0] = 3.0f;
+                    } else if(direction.equals("East")) {
+                        args[0] = 4.0f;
+                    }
+
+                    getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+                    //currentLocation = UpdateLocation(currentLocation, direction);
+                }
+            }
+
+            /*
+            Log.i("Masterserver", "received message with length" + length);
             // copy to string
             final String Input = new String(buffer, 0, length);
             Log.i("Masterserver", "received message = " + Input);
@@ -464,7 +517,8 @@ public class MainActivity extends ServiceActivity {
                 } else {
                     SendMessage("currentLocation" + currentLocation);
                 }
-            }
+            }*/
+
             runOnUiThread(new Runnable() {
                 public void run() {
                 }
@@ -501,6 +555,40 @@ public class MainActivity extends ServiceActivity {
                 return "False";
             }
             return "True";
+        }
+
+        public String RandomDirection() {
+            int direction = 1 + (int)(Math.random() * ((4 - 1) + 1));
+            if (direction == 1)
+                return "North";
+            else if (direction == 2)
+                return "East";
+            else if (direction == 3)
+                return "South";
+            else if (direction == 4)
+                return "West";
+            return "None";
+        }
+
+        public String KortstePadSolver(String currentLocation, String finalDestination) {
+            /* currentLocation -> "[x, y]" */
+            /* finalDestination -> "[x, y]" */
+            int currentX = Integer.valueOf(String.valueOf(currentLocation.charAt(1)));
+            int currentY = Integer.valueOf(String.valueOf(currentLocation.charAt(4)));
+            int finalX = Integer.valueOf(String.valueOf(finalDestination.charAt(1)));
+            int finalY = Integer.valueOf(String.valueOf(finalDestination.charAt(4)));
+
+            if (Math.abs(finalX - currentX) > Math.abs(finalY - currentY)) {
+                if (finalX > currentX)
+                    return "East";
+                else
+                    return "West";
+            } else {
+                if (finalY > currentY)
+                    return "North";
+                else
+                    return "South";
+            }
         }
 
         // Dit is de voorbeeldcode van Matthijs om een bericht te versturen.
@@ -593,12 +681,12 @@ public class MainActivity extends ServiceActivity {
                 for (Symbol sym : syms) {
                     String QRdata = sym.getData();
                     scanText.setText("QR-Code: " + QRdata);
+                    SendMessage("QRdata: " + QRdata);
                     final BluetoothService bluetooth = getBluetooth();
                     if(bluetooth != null) {
                         if (bluetooth.slave.isConnected()) {
                             logComm.append("To Master: " + QRdata + "\n");
                             bluetooth.slave.sendToMaster("QRdata: " + QRdata);
-                            SendMessage("QRdata: " + QRdata);
                         }
                     }
                     logComm.append("Scanned:"+ QRdata + "\n");
