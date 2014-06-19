@@ -51,19 +51,6 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 import net.sourceforge.zbar.Config;
 
-//Example send message
-//String string = "Test bericht";
-//
-//        byte[] b = string.getBytes();
-//        b = string.getBytes(Charset.forName("UTF-8"));
-//
-//        try {
-//        connection.write(b);
-//        } catch (IOException e) {
-//        Log.e("Masterserver", "Error with write");
-//        }
-
-
 public class MainActivity extends ServiceActivity {
     private static final String TAG = MainActivity.class.getName();
 
@@ -77,11 +64,7 @@ public class MainActivity extends ServiceActivity {
     private TextView listenerStatusText;
     private TextView ownAddressText;
     private Button listenerButton;
-
-    /* TODO remove later
-    private TextView deviceCountText;
-    private Button devicesButton;
-    */
+    private Button disconnectMaster;
 
     // mBed controls.
     private TextView mbedConnectedText;
@@ -90,11 +73,13 @@ public class MainActivity extends ServiceActivity {
     private Button showCameraLayout;
     private Button showMbedLayout;
     private Button showDebugLayout;
+    private Button showManualLayout;
 
     // Layout variables to identify the frames
     private LinearLayout cameraLayout;
     private LinearLayout mbedLayout;
     private LinearLayout debugLayout;
+    private LinearLayout manualLayout;
 
     // Declare monitoring log variable
     private TextView logComm;
@@ -107,7 +92,6 @@ public class MainActivity extends ServiceActivity {
     private CameraPreview mPreview;
     private Handler autoFocusHandler;
 
-    // TODO These buttons can be removed in the final version
     TextView scanText;
     Button scanButton;
 
@@ -118,18 +102,18 @@ public class MainActivity extends ServiceActivity {
     private boolean previewing = true;
 
     // Initialize variables for bluetooth connection
-    private String deviceAddress = "00:09:DD:50:8D:2A";
+    private String deviceAddress = "44:6D:57:4A:81:D4";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
     //Device address Matthijs: "00:15:83:15:A3:10";
     //Device address Xander: 00:09:DD:50:8D:2A
     //Device address Patrick: A4:17:31:ED:18:F8
+    //Device address Mike: 44:6D:57:4A:81:D4
 
     private BluetoothAdapter BA;
     private BluetoothThread connection;
 
     BluetoothDevice device;
-
     BluetoothSocket socket;
 
     // Load QR scanner library
@@ -151,7 +135,6 @@ public class MainActivity extends ServiceActivity {
         device = BluetoothAdapter.getDefaultAdapter().
                 getRemoteDevice(deviceAddress);
 
-
         /***
          * Attach layout buttons
          **/
@@ -169,6 +152,8 @@ public class MainActivity extends ServiceActivity {
                     showMbedLayout.setText("Show Connections");
                     debugLayout.setVisibility(View.GONE);
                     showDebugLayout.setText("Show Monitoring");
+                    manualLayout.setVisibility(View.GONE);
+                    showManualLayout.setText("Show Manual Controls");
                 }
             }
         });
@@ -186,6 +171,8 @@ public class MainActivity extends ServiceActivity {
                     showCameraLayout.setText("Show Camera Preview");
                     debugLayout.setVisibility(View.GONE);
                     showDebugLayout.setText("Show Monitoring");
+                    manualLayout.setVisibility(View.GONE);
+                    showManualLayout.setText("Show Manual Controls");
                 }
             }
         });
@@ -203,6 +190,27 @@ public class MainActivity extends ServiceActivity {
                     showCameraLayout.setText("Show Camera Preview");
                     mbedLayout.setVisibility(View.GONE);
                     showMbedLayout.setText("Show Connections");
+                    manualLayout.setVisibility(View.GONE);
+                    showManualLayout.setText("Show Manual Controls");
+                }
+            }
+        });
+        manualLayout = (LinearLayout)findViewById(R.id.manual_layout);
+        showManualLayout = (Button)findViewById(R.id.show_manual_layout);
+        showManualLayout.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if(manualLayout.getVisibility() == View.VISIBLE) {
+                    manualLayout.setVisibility(View.GONE);
+                    showManualLayout.setText("Show Manual Controls");
+                } else {
+                    manualLayout.setVisibility(View.VISIBLE);
+                    showManualLayout.setText("Hide Manual Controls");
+                    cameraLayout.setVisibility(View.GONE);
+                    showCameraLayout.setText("Show Camera Preview");
+                    mbedLayout.setVisibility(View.GONE);
+                    showMbedLayout.setText("Show Connections");
+                    debugLayout.setVisibility(View.GONE);
+                    showDebugLayout.setText("Show Monitoring");
                 }
             }
         });
@@ -298,7 +306,9 @@ public class MainActivity extends ServiceActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         registerReceiver(receiver, receiver.getIntentFilter());
+
         refreshBluetoothControls();
         refreshMbedControls();
     }
@@ -306,7 +316,9 @@ public class MainActivity extends ServiceActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         releaseCamera();
+
         unregisterReceiver(receiver);
     }
 
@@ -331,97 +343,59 @@ public class MainActivity extends ServiceActivity {
         ownAddressText = (TextView)findViewById(R.id.own_address);
         listenerStatusText = (TextView)findViewById(R.id.listener_status);
         listenerButton = (Button)findViewById(R.id.listener);
-        /* TODO remove this later
-        deviceCountText = (TextView)findViewById(R.id.device_count);
-        devicesButton = (Button)findViewById(R.id.devices);
-        devicesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent launch = new Intent(MainActivity.this, DevicesActivity.class);
-                startActivity(launch);
-            }
-        });
-        */
+        disconnectMaster = (Button)findViewById(R.id.disconnect);
 
         mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
-
-        // mBed controls.
-        // TODO Attach control to mbed buttons?
-
     }
 
     private void refreshBluetoothControls() {
         String slaveStatus = "Status not available";
         String slaveButton = "Start listening";
         String ownAddress = "Not available";
-        String connected = "0";
         boolean slaveButtonEnabled = false;
-        boolean devicesButtonEnabled = false;
 
         // Well it's not pretty, but it (barely) avoids duplicate logic.
         final BluetoothService bluetooth = getBluetooth();
         if (bluetooth != null) {
             slaveButtonEnabled = true;
-            devicesButtonEnabled = true;
+
             ownAddress = bluetooth.utility.getOwnAddress();
 
-            int devConnected = bluetooth.master.countConnected();
-            if (bluetooth.master.countConnected() > 0) {
-                connected = String.valueOf(devConnected);
-            }
+            slaveStatus = "Master connecting";
+            slaveButton = "Connect to master";
+            listenerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        Log.i("Masterserver", "Connected");
+                        socket = device.createRfcommSocketToServiceRecord(MY_UUID);
 
-            if (bluetooth.slave.isConnected()) {
-                slaveStatus = "Connected to " + bluetooth.slave.getRemoteDevice();
-                slaveButton = "Disconnect";
-                listenerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        bluetooth.slave.disconnect();
+                        //socket.connect();
+                    } catch (IOException e) {
+                        Log.e("Masterserver", "Error" + e);
                     }
-                });
-            } else if (bluetooth.slave.isListening()) {
-                slaveStatus = "Waiting for connection";
-                slaveButton = "Stop listening";
-                listenerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        bluetooth.slave.stopAcceptOne();
+
+                    connection = BluetoothThread.newInstance(socket, bluetoothListener);
+                }
+            });
+
+            disconnectMaster.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    try {
+                        connection.cancel();
+                        Log.i("Masterserver", "Disconnected");
+                    } catch(IOException e) {
+                        Log.e("Masterserver", "Error" + e);
                     }
-                });
-            } else {
-                slaveStatus = "Master connecting";
-                slaveButton = "Connect to master";
-                listenerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-//                        if (!bluetooth.utility.isDiscoverable()) {
-//                            bluetooth.utility.setDiscoverable();
-//                        }
-
-                        try {
-                            Log.i("Masterserver", "Connected");
-                            socket = device.createRfcommSocketToServiceRecord(MY_UUID);
-
-
-                            //socket.connect();
-                        } catch (IOException e) {
-                            Log.e("Masterserver", "Error" + e);
-                        }
-
-                        connection = BluetoothThread.newInstance(socket, bluetoothListener);
-                    }
-                });
-            }
+                }
+            });
         }
 
         listenerStatusText.setText(slaveStatus);
         listenerButton.setText(slaveButton);
         listenerButton.setEnabled(slaveButtonEnabled);
+        disconnectMaster.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
-        /* TODO remove later
-        deviceCountText.setText(connected);
-        devicesButton.setEnabled(devicesButtonEnabled);
-        */
     }
 
     private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
@@ -463,8 +437,9 @@ public class MainActivity extends ServiceActivity {
                 finalDestination = Input.replace("finalDestination: ", "");
                 roaming = false;
             } else if (Input.contains("currentLocation: ")) {
-                        /* Hier wordt de currentLocation ontvangen. */
+                        /* Hier word de current location ontvangen*/
                 currentLocation = Input.replace("currentLocation: ", "");
+
                 Log.i("Masterserver", "currenLocation: " + currentLocation);
                 //scanText.setText("Current Location: " + currentLocation);
                 if (roaming) {
@@ -607,16 +582,13 @@ public class MainActivity extends ServiceActivity {
 
     private void refreshMbedControls() {
         String connText = getString(R.string.not_connected); // if you want to localize
-        boolean enableButtons = false;
 
         MbedService mbed = getMbed();
         if (mbed != null && mbed.manager.areChannelsOpen()) {
             connText = getString(R.string.connected);
-            enableButtons = true;
         }
 
         mbedConnectedText.setText(connText);
-        // TODO enable disabled buttons?
     }
 
 
@@ -706,21 +678,7 @@ public class MainActivity extends ServiceActivity {
 
     // Broadcast receiver which handles incoming events. If it were smaller, inline it.
     private class MainActivityReceiver extends BroadcastReceiver {
-        String finalDestination = "[0, 0]";
-        String currentLocation = "[0, 0]";
-        String direction = "None";
-        String confirmation = "False";
-        boolean roaming = true;
-
-        // Refresh BT controls on these events.
-        private final String BLUETOOTH_REFRESH_ON[] = { MasterManager.DEVICE_ADDED,
-                                                        MasterManager.DEVICE_REMOVED,
-                                                        MasterManager.DEVICE_STATE_CHANGED,
-                                                        SlaveManager.LISTENER_CONNECTED,
-                                                        SlaveManager.LISTENER_DISCONNECTED,
-                                                        SlaveManager.STARTED_LISTENING,
-                                                        SlaveManager.STOPPED_LISTENING };
-
+        // Refresh Mbed controls on these events.
         private final String MBED_REFRESH_ON[] = {      MbedManager.DEVICE_ATTACHED,
                                                         MbedManager.DEVICE_DETACHED };
 
@@ -730,17 +688,12 @@ public class MainActivity extends ServiceActivity {
             IntentFilter filter = new IntentFilter();
 
             // Notification updates.
-            for (String action : BLUETOOTH_REFRESH_ON) {
-                filter.addAction(action);
-            }
             for (String action : MBED_REFRESH_ON) {
                 filter.addAction(action);
             }
 
             // Data received events.
             filter.addAction(MbedManager.DATA_READ);
-            filter.addAction(MasterManager.DEVICE_RECEIVED);
-            filter.addAction(SlaveManager.LISTENER_RECEIVED);
 
             return filter;
         }
@@ -749,13 +702,7 @@ public class MainActivity extends ServiceActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            // Refresh on most Bluetooth or mBed events.
-            for (String update : BLUETOOTH_REFRESH_ON) {
-                if (action.equals(update)) {
-                    refreshBluetoothControls();
-                    break;
-                }
-            }
+            // Refresh on most mBed events.
             for (String update : MBED_REFRESH_ON) {
                 if (action.equals(update)) {
                     refreshMbedControls();
@@ -763,72 +710,8 @@ public class MainActivity extends ServiceActivity {
                 }
             }
 
-            // Process received data.
-            if (action.equals(SlaveManager.LISTENER_RECEIVED)) {
-
-                // Slave received data from master.
-                Serializable obj = intent.getSerializableExtra(SlaveManager.EXTRA_OBJECT);
-                if (obj != null) {
-                    String Input = String.valueOf(obj);
-
-                    if (Input.contains("finalDestination: ")) {
-                        /* Hier wordt de finalDestination ontvangen. */
-                        finalDestination = Input.replace("finalDestination: ", "");
-                        roaming = false;
-                    } else if (Input.contains("currentLocation: ")) {
-                        /* Hier wordt de currentLocation ontvangen. */
-                        currentLocation = Input.replace("currentLocation: ", "");
-
-                        scanText.setText("Current Location: " + currentLocation);
-                        if (roaming)
-                            direction = RandomDirection();
-                        else
-                            direction = KortstePadSolver(currentLocation, finalDestination);
-                        final BluetoothService bluetooth = getBluetooth();
-                        if (bluetooth != null) {
-                            if (bluetooth.slave.isConnected()) {
-                                toastShort("To Master:\n" + direction);
-                                /* bluetooth.slave.sendToMaster(currentLocation, direction); */
-                                bluetooth.slave.sendToMaster("direction: " + direction);
-                            }
-                        }
-                    } else if (Input.contains("confirmation: ")) {
-                        /* Hier wordt de confirmation ontvangen. */
-                        confirmation = Input.replace("confirmation: ", "");
-                        toastShort("confirmation: " + confirmation);
-                        if (confirmation.equals("True")) {
-                            // TODO Send 'direction' to MBED through USB
-					        float[] args = new float[1];
-
-                            logComm.append("Direction: " + direction + "\n");
-
-                            if(direction.equals("North")) {
-                                args[0] = 1.0f;
-                            } else if(direction.equals("South")) {
-                                args[0] = 2.0f;
-                            } else if(direction.equals("West")) {
-                                args[0] = 3.0f;
-                            } else if(direction.equals("East")) {
-                                args[0] = 4.0f;
-                            }
-
-                            getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-                            //currentLocation = UpdateLocation(currentLocation, direction);
-                        }
-                    }
-                } else {
-                    toastShort("From master:\nnull");
-                }
-            } else if (action.equals(MasterManager.DEVICE_RECEIVED)) {
-                // Master received data from slave.
-                Serializable obj = intent.getSerializableExtra(MasterManager.EXTRA_OBJECT);
-                BluetoothDevice device = intent.getParcelableExtra(MasterManager.EXTRA_DEVICE);
-                if (obj != null) {
-                    toastShort("From " + device + "\n" + String.valueOf(obj));
-                } else {
-                    toastShort("From " + device + "\nnull!");
-                }
-            } else if (action.equals(MbedManager.DATA_READ)) {
+            // Process received data from Mbed
+            if (action.equals(MbedManager.DATA_READ)) {
 
                 // mBed data received.
                 MbedResponse response = intent.getParcelableExtra(MbedManager.EXTRA_DATA);
@@ -862,56 +745,6 @@ public class MainActivity extends ServiceActivity {
                     }
                 }
             }
-        }
-
-        public String RandomDirection() {
-            int direction = 1 + (int)(Math.random() * ((4 - 1) + 1));
-            if (direction == 1)
-                return "North";
-            else if (direction == 2)
-                return "East";
-            else if (direction == 3)
-                return "South";
-            else if (direction == 4)
-                return "West";
-            return "None";
-        }
-
-        public String KortstePadSolver(String currentLocation, String finalDestination) {
-            /* currentLocation -> "[x, y]" */
-            /* finalDestination -> "[x, y]" */
-            int currentX = Integer.valueOf(String.valueOf(currentLocation.charAt(1)));
-            int currentY = Integer.valueOf(String.valueOf(currentLocation.charAt(4)));
-            int finalX = Integer.valueOf(String.valueOf(finalDestination.charAt(1)));
-            int finalY = Integer.valueOf(String.valueOf(finalDestination.charAt(4)));
-
-            if (Math.abs(finalX - currentX) > Math.abs(finalY - currentY)) {
-                if (finalX > currentX)
-                    return "East";
-                else
-                    return "West";
-            } else {
-                if (finalY > currentY)
-                    return "North";
-                else
-                    return "South";
-            }
-        }
-
-        public String UpdateLocation(String currentLocation, String direction) {
-            /* currentLocation -> "[x, y]" */
-            int currentX = Integer.valueOf(String.valueOf(currentLocation.charAt(1)));
-            int currentY = Integer.valueOf(String.valueOf(currentLocation.charAt(4)));
-            if (direction == "North")
-                return "[" + currentX + ", " + (currentY + 1) + "]";
-            else if (direction == "East")
-                return "[" + (currentX + 1) + ", " + currentY + "]";
-            else if (direction == "South")
-                return "[" + currentX + ", " + (currentY - 1) + "]";
-            else if (direction == "West")
-                return "[" + (currentX - 1) + ", " + currentY + "]";
-            else
-                return "[" + currentX + ", " + currentY + "]";
         }
     }
 }

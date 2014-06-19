@@ -84,56 +84,6 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:id="@+id/mbed_connected"
                     android:text="@string/not_connected" />
-                <!---
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Bluetooth (master)"
-                    android:id="@+id/master_mode_title"
-                    android:textStyle="bold"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="2dp" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="0"
-                        android:id="@+id/device_count"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="devices connected"
-                        android:id="@+id/device_count_label"
-                        android:layout_marginLeft="5dp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="1">
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/devices"
-                        android:text="Remote devices"
-                        android:enabled="false"
-                        android:layout_weight="1" />
-                </LinearLayout>
-                -->
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -181,6 +131,53 @@
                     android:text="@string/start_listening"
                     android:enabled="false"
                     android:layout_weight="1" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/disconnect"
+                    android:text="Disconnect master"
+                    android:enabled="false"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Manual Controls"
+                android:id="@+id/show_manual_layout" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/manual_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Forward"
+                    android:id="@+id/temp"
+                    android:layout_below="@+id/scrollView"
+                    android:layout_centerHorizontal="true" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Backward"
+                    android:id="@+id/temp2" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Left"
+                    android:id="@+id/temp3" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Right"
+                    android:id="@+id/temp4" />
             </LinearLayout>
 
             <Button
@@ -202,33 +199,6 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:id="@+id/log_comm" />
             </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Forward"
-                android:id="@+id/temp"
-                android:layout_below="@+id/scrollView"
-                android:layout_centerHorizontal="true" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Backward"
-                android:id="@+id/temp2" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Left"
-                android:id="@+id/temp3" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Right"
-                android:id="@+id/temp4" />
-
         </LinearLayout>
     </ScrollView>
 
