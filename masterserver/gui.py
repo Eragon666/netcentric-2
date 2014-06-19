@@ -12,6 +12,9 @@ canvas_height = 600
 x = 3
 y = 3
 
+robotX = 0
+robotY = 0
+
 #Listen to bluetooth connection boolean
 listen = 1;
 
@@ -66,17 +69,17 @@ def listenBluetooth():
                     pass
                 else:
                     client_sock.send("currentLocation: [1, 1]")
-                    gui = Gui(root)
-                    gui.parser(data)                
+                    robotX = 1
+                    gui()
                 print("received [%s]" % data)
             except IOError:
                 pass
 
 def guiMain():
     global root
-    gui=Gui(root)
-    root.protocol("WM_DELETE_WINDOW", gui.handler)
-    root.mainloop()
+    gui()
+    #root.protocol("WM_DELETE_WINDOW", gui.handler)
+    #root.mainloop()
     print("disconnected");
 
 def exitGui():
@@ -93,30 +96,28 @@ def connect():
     print("Accepted connection from ", client_info)
     listen = 1;     
 
-def draw(self,x,y,size):
-    	drawQR(self,x,y,size)
+def drawQR(x,y,size,canvas):
+    global root
+    dsize = size/4
+    nextx = x
+    nexty = y
+    for i in range(4):
+        nextx = nextx+dsize
+        for j in range(4):
+            if(random.randint(0,1)==1):
+                color ="black"
+            else:
+                color="white"
+            nexty = nexty+dsize
+            figure=canvas.create_rectangle(nextx,nexty,nextx+dsize,nexty+dsize, fill=color)
+        nexty = y
 
-def drawQR(self,x,y,size):
-		dsize = size/4
-		nextx = x
-		nexty = y
-		for i in range(4):
-			nextx = nextx+dsize
-			for j in range(4):
-				if(random.randint(0,1)==1):
-					color ="black"
-				else:
-					color="white"
-				nexty = nexty+dsize
-		 		figure=self.canvas.create_rectangle(nextx,nexty,nextx+dsize,nexty+dsize, fill=color)
-		 	nexty = y
-
-def drawRobot(self,x,y,size,direction,xco,yco):
+def drawRobot(x,y,size,direction,xco,yco,canvas):
 	x *= xco
 	y *= yco
 	x += size/8
 	y+= size/8
-	figure=self.canvas.create_rectangle(x,y,x+size/4,y+size/4, fill="yellow")
+	figure=canvas.create_rectangle(x,y,x+size/4,y+size/4, fill="yellow")
 
 #def parser(self, data):
     #for s in data:
@@ -125,51 +126,51 @@ def drawRobot(self,x,y,size,direction,xco,yco):
     #self.canvas.update_idletasks()
     #drawRobot(self,20,20,300,1,1,1)
 
-class Gui():
-    def __init__(self, root):
-        self.root=root
-        self.entry = tk.Entry(root)
-        stvar=tk.StringVar()
-        stvar.set("one")
+def gui():
+    global root
+    entry = tk.Entry(root)
+    stvar=tk.StringVar()
+    stvar.set("one")
 
-        self.canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
-        self.canvas.grid(row=0,column=1,padx=10)
+    canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
+    canvas.grid(row=0,column=1,padx=10)
 
-        #frame = Frame(self.root)
-        #frame.grid(row=0,column=0, sticky="n")
-        label1=Label(self.root, text="Grid size")
-        label1.grid(row=0,column=0, sticky="nw")
-        #label2=Label(self.root, text="X").grid(row=1,column=0, sticky="w")
-        # self.option.grid(row=0,column=1,sticky="nwe")
-        e = Entry(self.root)
-        e.grid(row = 1,column = 1,sticky = E+ W)
-        text = e.get()
-        print text
-        Button1=Button(self.root,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
+    #frame = Frame(self.root)
+    #frame.grid(row=0,column=0, sticky="n")
+    label1=Label(root, text="Grid size")
+    label1.grid(row=0,column=0, sticky="nw")
+    label2=Label(root, text="X").grid(row=1,column=0, sticky="w")
+    # self.option.grid(row=0,column=1,sticky="nwe")
+    e = Entry(root)
+    e.grid(row = 1,column = 1,sticky = E+ W)
+    text = e.get()
+    print text
+    Button1=Button(root,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
 
-        for i in range(x):
-        	for j in range(y):
-        		dx = canvas_width/x
-        		dy = canvas_height/y
-        		draw(self,dx*i,dy*j,dx/2)
-        # Grid.columnconfigure(self.root,1,weight=1, size=200)
-        drawRobot(self,dx,dy,300,1,1,2)
-        #drawRobot(self,dx,dy,300,1,0,0)
+    for i in range(x):
+        for j in range(y):
+            dx = canvas_width/x
+            dy = canvas_height/y
+            drawQR(dx*i,dy*j,dx/2, canvas)
 
-    def handler(self):
-        if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
-            #client_sock.close()
-            #server_sock.close()
-            exitGui()
-            print "1"
-            quit = True
-            print "2"
-            print("vamos a la playa")
-            self.root.quit()
-            print "3"
-            
-    def parser(self, data):
-        drawRobot(self,20,20,300,1,1,1)
+    drawRobot(dx,dy,300,1,robotX,robotY,canvas)
+    #drawRobot(dx,dy,300,1,0,0,canvas)
+    root.mainloop()
+
+def handler(self):
+    if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
+        #client_sock.close()
+        #server_sock.close()
+        exitGui()
+        print "1"
+        quit = True
+        print "2"
+        print("vamos a la playa")
+        self.root.quit()
+        print "3"
+        
+def parser(self, data):
+    drawRobot(self,20,20,300,1,1,1)
         
 if __name__== '__main__':
     global quit
