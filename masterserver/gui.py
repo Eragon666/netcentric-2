@@ -4,6 +4,7 @@ from Tkinter import *
 from bluetooth import *
 import tkMessageBox
 import random
+from time import *
 
 canvas_width = 600
 canvas_height = 600
@@ -17,9 +18,11 @@ listen = 1;
 #To store the multiple threads in
 threads = []
 
+global server_sock
 server_sock=BluetoothSocket(RFCOMM)
 server_sock.bind(("",PORT_ANY))
 server_sock.listen(1)
+global client_sock
 
 port = server_sock.getsockname()[1]
 
@@ -36,7 +39,11 @@ advertise_service( server_sock, "SampleServer",
 
 def listenBluetooth():
     print "Waiting for connection"
+    global client_sock, client_info
     client_sock, client_info = server_sock.accept()
+    #thread1 = Thread(target = guiMain, args=client_sock)
+    #thread1.start()
+    #threads.append(thread1)    
     print("Accepted connection from ", client_info)
     while True:
         if (listen):
@@ -51,14 +58,20 @@ def guiMain():
     root=tk.Tk()
     root.resizable(width=FALSE, height=FALSE)
     gui=Gui(root)
-    root.protocol("WM_DELETE_WINDOW", Gui.handler)
+    root.protocol("WM_DELETE_WINDOW", gui.handler)
     root.mainloop()
     print("disconnected");
 
-
+def exitGui():
+    #global client_sock
+    #client_sock.close()
+    server_sock.close()
+    #for thread in threads:
+        #thread.join()
 
 def connect():
     print "Waiting for connection"
+    global client_sock, client_info
     client_sock, client_info = server_sock.accept()
     print("Accepted connection from ", client_info)
     listen = 1;     
@@ -103,8 +116,9 @@ class Gui():
 
         #frame = Frame(self.root)
         #frame.grid(row=0,column=0, sticky="n")
-        label1=Label(self.root, text="Grid size").grid(row=0,column=0, sticky="nw")
-        label2=Label(self.root, text="X").grid(row=1,column=0, sticky="w")
+        label1=Label(self.root, text="Grid size")
+        label1.grid(row=0,column=0, sticky="nw")
+        #label2=Label(self.root, text="X").grid(row=1,column=0, sticky="w")
         # self.option.grid(row=0,column=1,sticky="nwe")
         e = Entry(self.root)
         e.grid(row = 1,column = 1,sticky = E+ W)
@@ -121,14 +135,16 @@ class Gui():
         drawRobot(self,dx,dy,50,1,1,2)
         drawRobot(self,dx,dy,50,1,5,4)
 
-    def handler():
+    def handler(self):
         if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
-            client_sock.close()
-            server_sock.close()
+            #client_sock.close()
+            #server_sock.close()
+            exitGui()
             print("vamos a la playa")
-            root.quit()
+            self.root.quit()
 
 if __name__== '__main__':
+    global client_sock, client_info
     thread = Thread(target = listenBluetooth)
     thread.start()
     threads.append(thread)
@@ -137,5 +153,9 @@ if __name__== '__main__':
     thread1.start()
     threads.append(thread1)
     
+
+    
     for thread in threads:
         thread.join()
+
+    client_sock.close()
