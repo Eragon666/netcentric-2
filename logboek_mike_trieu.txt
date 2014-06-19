@@ -56,4 +56,9 @@ Netcentric Computing - Labreport Week 2-4
 - QR codes testen, random beweging testen [met Patrick]
 
 18/6/2014
-- Calibreren
+- Calibreren onmirobot [met Floris]
+
+19/6/2014
+- Masterapp naar laptop bluetooth server verplaatst [met Patrick]
+- Aanpassingen aan layout
+- Code schoongemaakt, bluetooth functies van framework verwijdert
