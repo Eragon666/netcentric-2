@@ -9,8 +9,8 @@ from time import *
 canvas_width = 600
 canvas_height = 600
 
-x = 10
-y = 10
+x = 3
+y = 3
 
 #Listen to bluetooth connection boolean
 listen = 1;
@@ -18,10 +18,17 @@ listen = 1;
 #To store the multiple threads in
 threads = []
 
+global root
+root=tk.Tk()
+root.resizable(width=FALSE, height=FALSE)
+
+global quit
+
 global server_sock
 server_sock=BluetoothSocket(RFCOMM)
 server_sock.bind(("",PORT_ANY))
 server_sock.listen(1)
+
 global client_sock
 
 port = server_sock.getsockname()[1]
@@ -38,7 +45,9 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
+    global root
     print "Waiting for connection"
+    global quit
     global client_sock, client_info
     client_sock, client_info = server_sock.accept()
     #thread1 = Thread(target = guiMain, args=client_sock)
@@ -46,17 +55,25 @@ def listenBluetooth():
     #threads.append(thread1)    
     print("Accepted connection from ", client_info)
     while True:
-        if (listen):
+        print quit
+        if (quit):
+            client_sock.close()
+            break
+        elif (listen):
             try:
                 data = client_sock.recv(1024)
-                if len(data) == 0: pass
+                if len(data) == 0:
+                    pass
+                else:
+                    client_sock.send("currentLocation: [1, 1]")
+                    gui = Gui(root)
+                    gui.parser(data)                
                 print("received [%s]" % data)
             except IOError:
                 pass
 
 def guiMain():
-    root=tk.Tk()
-    root.resizable(width=FALSE, height=FALSE)
+    global root
     gui=Gui(root)
     root.protocol("WM_DELETE_WINDOW", gui.handler)
     root.mainloop()
@@ -101,8 +118,12 @@ def drawRobot(self,x,y,size,direction,xco,yco):
 	y+= size/8
 	figure=self.canvas.create_rectangle(x,y,x+size/4,y+size/4, fill="yellow")
 
-
-
+#def parser(self, data):
+    #for s in data:
+        #if s
+     
+    #self.canvas.update_idletasks()
+    #drawRobot(self,20,20,300,1,1,1)
 
 class Gui():
     def __init__(self, root):
@@ -132,19 +153,28 @@ class Gui():
         		dy = canvas_height/y
         		draw(self,dx*i,dy*j,dx/2)
         # Grid.columnconfigure(self.root,1,weight=1, size=200)
-        drawRobot(self,dx,dy,50,1,1,2)
-        drawRobot(self,dx,dy,50,1,5,4)
+        drawRobot(self,dx,dy,300,1,1,2)
+        #drawRobot(self,dx,dy,300,1,0,0)
 
     def handler(self):
         if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
             #client_sock.close()
             #server_sock.close()
             exitGui()
+            print "1"
+            quit = True
+            print "2"
             print("vamos a la playa")
             self.root.quit()
-
+            print "3"
+            
+    def parser(self, data):
+        drawRobot(self,20,20,300,1,1,1)
+        
 if __name__== '__main__':
+    global quit
     global client_sock, client_info
+    quit = False
     thread = Thread(target = listenBluetooth)
     thread.start()
     threads.append(thread)
@@ -158,4 +188,4 @@ if __name__== '__main__':
     for thread in threads:
         thread.join()
 
-    client_sock.close()
+    #client_sock.close()

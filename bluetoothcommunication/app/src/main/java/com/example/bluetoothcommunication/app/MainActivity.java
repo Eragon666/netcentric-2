@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
     }
 
     public void on(View view){
-        String string = "Daan is lui";
+        String string = "Locatie: [1, 1]; Robot-ID: 21;";
 
         byte[] b = string.getBytes();
         b = string.getBytes(Charset.forName("UTF-8"));
