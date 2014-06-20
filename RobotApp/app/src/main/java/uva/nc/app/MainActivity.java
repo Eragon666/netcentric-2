@@ -102,7 +102,7 @@ public class MainActivity extends ServiceActivity {
     private boolean previewing = true;
 
     // Initialize variables for bluetooth connection
-    private String deviceAddress = "44:6D:57:4A:81:D4";
+    private String deviceAddress = "00:09:DD:50:8D:2A";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
     //Device address Matthijs: "00:15:83:15:A3:10";
@@ -442,6 +442,8 @@ public class MainActivity extends ServiceActivity {
 
                 Log.i("Masterserver", "currenLocation: " + currentLocation);
                 //scanText.setText("Current Location: " + currentLocation);
+
+                //TODO: niet meer locatie/ richting gebruiken die al afgekeurd is
                 if (roaming) {
                     direction = RandomDirection();
                     Log.i("Masterserver", "RandomDirection");
@@ -507,6 +509,7 @@ public class MainActivity extends ServiceActivity {
         String[] ReservedLocations = {"[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"};
         //ReservedLocations[3] = "[1, 2]";
 
+        //TODO: remove for final version
         public String Confirm(String currentLocation, String direction) {
             /* Also needs a global array with all the reserved locations.
              * Currently named: 'ReservedLocations' */
