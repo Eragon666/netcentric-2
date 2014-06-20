@@ -92,6 +92,7 @@ public class MainActivity extends ServiceActivity {
     private CameraPreview mPreview;
     private Handler autoFocusHandler;
 
+    // QR scanner controls
     TextView scanText;
     Button scanButton;
 
@@ -224,7 +225,7 @@ public class MainActivity extends ServiceActivity {
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
 
-                logComm.append("Sent Drive forward message to mbed\n");
+                logComm.append("* Sent Drive forward message to mbed\n");
             }
         });
         Button temp2Button = (Button)findViewById(R.id.temp2);
@@ -235,7 +236,7 @@ public class MainActivity extends ServiceActivity {
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
 
-                logComm.append("Sent Drive backward message to mbed\n");
+                logComm.append("* Sent Drive backward message to mbed\n");
             }
         });
         Button temp3Button = (Button)findViewById(R.id.temp3);
@@ -246,7 +247,7 @@ public class MainActivity extends ServiceActivity {
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
 
-                logComm.append("Sent Drive left message to mbed\n");
+                logComm.append("* Sent Drive left message to mbed\n");
             }
         });
         Button temp4Button = (Button)findViewById(R.id.temp4);
@@ -257,7 +258,7 @@ public class MainActivity extends ServiceActivity {
 
                 getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
 
-                logComm.append("Sent Drive right message to mbed\n");
+                logComm.append("* Sent Drive right message to mbed\n");
             }
         });
 
@@ -286,7 +287,7 @@ public class MainActivity extends ServiceActivity {
         FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
         preview.addView(mPreview);
 
-        // TODO To be removed in the final version
+        // Attach scan controls
         scanText = (TextView)findViewById(R.id.scanText);
         scanButton = (Button)findViewById(R.id.ScanButton);
         scanButton.setOnClickListener(new OnClickListener() {
@@ -451,16 +452,18 @@ public class MainActivity extends ServiceActivity {
                     direction = KortstePadSolver(currentLocation, finalDestination);
                     Log.i("Masterserver", "KorstePadSolver");
                 }
+
+                logComm.append("Sent direction to master: " + confirmation);
                 SendMessage("direction: " + direction);
             } else if (Input.contains("confirmation: ")) {
-                        /* Hier wordt de confirmation ontvangen. */
+                /* Hier wordt de confirmation ontvangen. */
                 confirmation = Input.replace("confirmation: ", "");
-                toastShort("confirmation: " + confirmation);
+                logComm.append("Direction is free?: " + confirmation);
+
                 if (confirmation.equals("True")) {
-                    // TODO Send 'direction' to MBED through USB
                     float[] args = new float[1];
 
-                    logComm.append("Direction: " + direction + "\n");
+                    logComm.append("* Driving direction: " + direction + "\n");
 
                     if(direction.equals("North")) {
                         args[0] = 1.0f;
@@ -473,28 +476,8 @@ public class MainActivity extends ServiceActivity {
                     }
 
                     getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-                    //currentLocation = UpdateLocation(currentLocation, direction);
                 }
             }
-
-            /*
-            Log.i("Masterserver", "received message with length" + length);
-            // copy to string
-            final String Input = new String(buffer, 0, length);
-            Log.i("Masterserver", "received message = " + Input);
-            if (Input.contains("QRdata: ")) {
-                String QRdata = Input.replace("QRdata: ", "");
-                currentLocation = QRdata.replace("Locatie: ", "");
-                SendMessage("currentLocation: " + currentLocation);
-            } else if (Input.contains("direction: ")) {
-                direction = Input.replace("direction: ", "");
-                confirmation = Confirm(currentLocation, direction);
-                if (confirmation.equals("True")) {
-                    SendMessage("confirmation: " + confirmation);
-                } else {
-                    SendMessage("currentLocation" + currentLocation);
-                }
-            }*/
 
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -575,7 +558,7 @@ public class MainActivity extends ServiceActivity {
 
             try {
                 connection.write(b);
-                toastShort("Sent to laptop\n");
+                logComm.append("* Sent " + Message + "to master\n");
             } catch (IOException e) {
                 Log.e("Masterserver", "Error with write");
             }
@@ -630,15 +613,13 @@ public class MainActivity extends ServiceActivity {
 
             try {
                 connection.write(b);
-                toastShort("Sent to laptop\n");
+                logComm.append("* Sent " + Message + "to master\n");
             } catch (IOException e) {
                 Log.e("Masterserver", "Error with write");
             }
         }
 
         public void onPreviewFrame(byte[] data, Camera camera) {
-            /* Hier wordt de QR-code gescand, maar dit moet dus verplaatst
-               worden naar de plek waar MBED-signalen worden ontvangen. */
             Camera.Parameters parameters = camera.getParameters();
             Camera.Size size = parameters.getPreviewSize();
 
@@ -656,15 +637,11 @@ public class MainActivity extends ServiceActivity {
                 for (Symbol sym : syms) {
                     String QRdata = sym.getData();
                     scanText.setText("QR-Code: " + QRdata);
+
                     SendMessage("QRdata: " + QRdata);
-                    final BluetoothService bluetooth = getBluetooth();
-                    if(bluetooth != null) {
-                        if (bluetooth.slave.isConnected()) {
-                            logComm.append("To Master: " + QRdata + "\n");
-                            bluetooth.slave.sendToMaster("QRdata: " + QRdata);
-                        }
-                    }
-                    logComm.append("Scanned:"+ QRdata + "\n");
+
+                    logComm.append("* Scanned:"+ QRdata + "\n");
+
                     barcodeScanned = true;
                 }
             }
@@ -726,13 +703,13 @@ public class MainActivity extends ServiceActivity {
                     }
 
                     float[] values = response.getValues();
-                    // TODO do something with received Mbed values
+
                     if (response.getCommandId() == COMMAND_DRIVE) {
                         if (values == null || values.length != 1) {
                             toastShort("Error!");
                         } else {
-                            // TODO if ok to scan (need to use values[])
-                            logComm.append("Received ok to scan message from mbed\n");
+                            logComm.append("* Finished driving, ok to scan\n");
+
                             if((int)values[0] == 0) {
                                 if (barcodeScanned) {
                                     barcodeScanned = false;
@@ -743,7 +720,6 @@ public class MainActivity extends ServiceActivity {
                                     mCamera.autoFocus(autoFocusCB);
                                 }
                             }
-                            logComm.append("Scanning...\n");
                         }
                     }
                 }

@@ -62,3 +62,6 @@ Netcentric Computing - Labreport Week 2-4
 - Masterapp naar laptop bluetooth server verplaatst [met Patrick]
 - Aanpassingen aan layout
 - Code schoongemaakt, bluetooth functies van framework verwijdert
+
+20/6/2014
+- 
