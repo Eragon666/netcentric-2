@@ -164,8 +164,21 @@ def drawRobot(x,y,size,direction,xco,yco,canvas):
     yco -= 1
     x *= xco
     y *= yco
-    
-    figure=canvas.create_rectangle(x+size/2,canvas_height-y -size/4,x+size,canvas_height-y-size+size/4, fill="yellow")
+
+    xleft = x+size/2
+    xright = x+size
+    ydown = canvas_height-y-size/4
+    yup = canvas_height-y-size+size/4
+
+    if (direction == "North"):
+        figure = canvas.create_polygon(xleft, ydown, xright, ydown, xleft+size/4, yup, fill="red")
+    elif (direction == "East"):
+        figure = canvas.create_polygon(xleft, ydown, xleft, yup, xright, ydown-size/4, fill="red")
+    elif (direction == "South"):
+        figure = canvas.create_polygon(xleft, yup, xright, yup, xleft+size/4, ydown, fill="red")
+    elif (direction == "West"):
+        figure = canvas.create_polygon(xleft, ydown-size/4, xright, ydown, xright, yup, fill="red")
+    #figure=canvas.create_rectangle(x+size/2,canvas_height-y -size/4,x+size,canvas_height-y-size+size/4, fill="yellow")
 
 #def parser(self, data):
     #for s in data:
@@ -201,7 +214,7 @@ def gui():
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
 
-    drawRobot(dx,dy,dx/2,1,robotX,robotY,canvas)
+    drawRobot(dx,dy,dx/2,"West",robotX,robotY,canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
 
