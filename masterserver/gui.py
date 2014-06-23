@@ -90,7 +90,7 @@ def listenBluetooth():
         return "True"
     
     global root
-    print "Waiting for connection"
+    print("Waiting for connection on RFCOMM channel %d" %port)
     global quit
     global client_sock, client_info
     #global clients
@@ -167,10 +167,12 @@ def listenBluetooth():
 
 def guiMain():
     global root
+    global server_sock
     gui()
     #root.protocol("WM_DELETE_WINDOW", gui.handler)
     root.mainloop()
     print("disconnected");
+    server_sock.close()
 
 def exitGui():
     #global client_sock
@@ -301,9 +303,11 @@ if __name__== '__main__':
     thread.start()
     threads.append(thread)
     
-    thread1 = Thread(target = guiMain)
-    thread1.start()
-    threads.append(thread1)
+    guiMain()
+
+    #thread1 = Thread(target = guiMain)
+    #thread1.start()
+    #threads.append(thread1)
     
 
     
