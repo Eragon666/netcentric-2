@@ -22,7 +22,8 @@ global robotY
 robotY = 0
 global ID
 ID = 0
-
+global robots
+robots = {}
 global direction
 direction = "None"
 global clients
@@ -110,6 +111,7 @@ def listenBluetooth():
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
                 print("Accepted connection from ", addr)
+                robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
             else:
                 data = s.recv(1024)
