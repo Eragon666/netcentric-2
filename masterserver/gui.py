@@ -163,7 +163,7 @@ def drawRobot(x,y,size,direction,xco,yco,canvas):
     x *= xco
     y *= yco
     
-    figure=canvas.create_rectangle(x+size,canvas_height-y,x+size/8,canvas_height-y+size/8, fill="yellow")
+    figure=canvas.create_rectangle(x+size/2,canvas_height-y -size/4,x+size,canvas_height-y-size+size/4, fill="yellow")
 
 #def parser(self, data):
     #for s in data:
@@ -204,6 +204,7 @@ def gui():
     #root.mainloop()
 
 def handler(self):
+    global quit
     if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
         #client_sock.close()
         #server_sock.close()
