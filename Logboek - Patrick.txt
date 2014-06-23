@@ -43,6 +43,7 @@ Vandaag heb ik een blokschema opgesteld en een uitleg bijgevoegd. Ook hebben Mik
 
 23-06-2014
 Vandaag hebben we onderzocht hoe het probleem dat we slechts een robot tegelijk kunnen verbinden met de MasterApp kunnen oplossen. Twee oplossingen:
-   1. Terug naar het framework en nog een mobiel apparaat tussen de MasterApp op de laptop en de SlaveApps op de robot/MBED.
-   2. Overstappen van Bluetooth naar WiFi.
+   1. De MasterApp op de laptop uitbreiden zodat er twee mobiele apparaten via Bluetooth verbonden kunnen worden.
+   2. Terug naar het framework en nog een mobiel apparaat tussen de MasterApp op de laptop en de SlaveApps op de robot/MBED.
+   3. Overstappen van Bluetooth naar WiFi.
 Aangezien optie twee waarschijnlijk teveel tijd gaat kosten, gaan we proberen om optie een nog te implementeren. De onzekerheid ligt in de korte tijd tot de deadline.
