@@ -1,8 +1,6 @@
 from threading import Thread
-#import Tkinter as tk
-import mtTkinter as tk
-#from Tkinter import *
-from mtTkinter import *
+import Tkinter as tk
+from Tkinter import *
 from bluetooth import *
 import tkMessageBox
 import random
@@ -243,9 +241,11 @@ if __name__== '__main__':
     thread.start()
     threads.append(thread)
     
-    thread1 = Thread(target = guiMain)
-    thread1.start()
-    threads.append(thread1)
+    guiMain()
+
+    #thread1 = Thread(target = guiMain)
+    #thread1.start()
+    #threads.append(thread1)
     
 
     
