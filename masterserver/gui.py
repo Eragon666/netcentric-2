@@ -1,11 +1,14 @@
 from threading import Thread
 import Tkinter as tk
+#import mtTkinter as tk
 from Tkinter import *
+#from mtTkinter import *
 from bluetooth import *
 import tkMessageBox
 import random
 from time import *
 import re
+import select
 
 canvas_width = 600
 canvas_height = 600
@@ -23,9 +26,13 @@ ID = 0
 global robots
 robots = {}
 
+global direction
+direction = "None"
+global clients
+clients = []
+
 #Listen to bluetooth connection boolean
-global listen
-listen = True
+listen = 1;
 
 #To store the multiple threads in
 threads = []
@@ -41,7 +48,7 @@ server_sock=BluetoothSocket(RFCOMM)
 server_sock.bind(("",PORT_ANY))
 server_sock.listen(1)
 
-port = server_sock.getsockname()[1]
+read = [server_sock]
 
 global client_sock
 
@@ -59,53 +66,30 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
-    global robots
     currentLocation = "[1, 1]"
-    direction = "None"
+    global direction
     confirmation = "False"
 
     ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
-    OccupiedLocations = [[0 for x in xrange(4)] for x in xrange(4)] 
-    for i in range(4):
-        OccupiedLocations[3][i] = 1
-        OccupiedLocations[i][3] = 1
-    
-    
-    
+
     def Confirm(currentLocation, direction):
         # Also needs a global array with all the reserved locations.
         # Currently named: 'ReservedLocations' */
         # Initialize 'newPosition' based on parameters.
         newPostion = ""
-        newX = 0
-        newY = 0
         test = currentLocation.replace("Locatie: ", "")
         currentX = int(test[1])
         currentY = int(test[4])
         if direction == "North":
-            #newPosition = "[" + str(currentX) + ", " + str(currentY + 1) + "]"
-            newX = currentX
-            newY = currentY + 1
+            newPosition = "[" + str(currentX) + ", " + str(currentY + 1) + "]"
         elif direction == "East":
-            #newPosition = "[" + str(currentX + 1) + ", " + str(currentY) + "]"
-            newX = currentX + 1
-            newY = currentY
+            newPosition = "[" + str(currentX + 1) + ", " + str(currentY) + "]"
         elif direction == "South":
-            #newPosition = "[" + str(currentX) + ", " + str(currentY - 1) + "]"
-            newX = currentX
-            newY = currentY - 1
+            newPosition = "[" + str(currentX) + ", " + str(currentY - 1) + "]"
         elif direction == "West":
-            #newPosition = "[" + str(currentX - 1) + ", " + str(currentY) + "]"
-            newX = currentX - 1
-            newY = currentY
-          
-        if OccupiedLocations[newX][newY] == 1:
-            print "locations array"
-            return "False"
+            newPosition = "[" + str(currentX - 1) + ", " + str(currentY) + "]"
             
-        newPosition = "[" + str(newX) + ", " + str(newY) + "]"
         if newPosition in ReservedLocations:
-            print "locations string"
             return "False"
         
         return "True"
@@ -114,62 +98,87 @@ def listenBluetooth():
     print("Waiting for connection on RFCOMM channel %d" %port)
     global quit
     global client_sock, client_info
-    global server_sock
-    client_sock, client_info = server_sock.accept()
-
+    #global clients
+    #clients.append(server_sock.accept())
     #thread1 = Thread(target = guiMain, args=client_sock)
     #thread1.start()
     #threads.append(thread1)    
-    print("Accepted connection from ", client_info)
-    robots[client_info] = [ID,robotX,robotY,direction,"red"]
+    #print("Accepted connection from ", clients[-1][1])
+    #clients[-1][0].setblocking(0)
     while True:
-        print quit
-        if (quit):
-            client_sock.close()
-            print "quitPOEP"
-            break
-        elif (listen):
-            try:
-                print "listenPOEP"
-                data = client_sock.recv(1024)
-                if len(data) == 0:
-                    pass
-                else:
+        readable, writable, exceptional = select.select(read,read,[])
+
+        for s in readable:
+            if s == server_sock:
+                conn, addr = server_sock.accept()
+                s.setblocking(0)
+                print("Accepted connection from ", addr)
+                robots[addr] = [ID,robotX,robotY,direction,"red"]
+                read.append(conn)
+            else:
+                data = s.recv(1024)
+                if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
                         currentLocation = QRdata.replace("Locatie: ", "").replace("; Robot-ID: 21;", "")
-                        client_sock.send("currentLocation: " + currentLocation)
+                        s.send("currentLocation: " + currentLocation)
                     elif "direction: " in data:
                         direction = data.replace("direction: ", "")
                         confirmation = Confirm(currentLocation, direction)
                         if confirmation =="True":
-                            client_sock.send("confirmation: " + confirmation)
+                            s.send("confirmation: " + confirmation)
                         else:
-                            client_sock.send("currentLocation: " + currentLocation)
+                            s.send("currentLocation: " + currentLocation)
                     print data
                     parser(data)
                     gui()
                     print("received [%s]" % data)
+                else:
+                    print "connection", addr, "closed"
+                    s.close()
+                    read.remove(s)
+        
+        #print quit
+        """
+        if (quit):
+            for client in clients:
+                client[0].close()
+            break
+        elif (listen):
+            try:
+                for client in clients:
+                    data = client[0].recv(1024)
+                    if len(data) == 0:
+                        pass
+                    else:
+                        if "QRdata: " in data:
+                            QRdata = data.replace("QRdata: ", "")
+                            currentLocation = QRdata.replace("Locatie: ", "").replace("; Robot-ID: 21;", "")
+                            client[0].send("currentLocation: " + currentLocation)
+                        elif "direction: " in data:
+                            direction = data.replace("direction: ", "")
+                            confirmation = Confirm(currentLocation, direction)
+                            if confirmation =="True":
+                                client[0].send("confirmation: " + confirmation)
+                            else:
+                                client[0].send("currentLocation: " + currentLocation)
+                        print data
+                        parser(data)
+                        gui()
+                        print("received [%s]" % data)
+                
             except IOError:
                 pass
-        else:
-            print "elsePOEP"
-            break
+                """
+
 def guiMain():
     global root
-    global quit
-    global listen
     global server_sock
     gui()
     #root.protocol("WM_DELETE_WINDOW", gui.handler)
     root.mainloop()
     print("disconnected");
-    quit = True
     server_sock.close()
-    exitGui()
-    root.quit()
-    listen = False
-    print "vamos a la playa"
 
 def exitGui():
     #global client_sock
@@ -181,10 +190,11 @@ def exitGui():
 def connect():
     print "Waiting for connection"
     global client_sock, client_info
-    client_sock, client_info = server_sock.accept()
-    print("Accepted connection from ", client_info)
-
-    listen = 1
+    global clients
+    clients.append(server_sock.accept())
+    print("Accepted connection from ", clients[-1][1])
+    clients[-1][0].setblocking(0)
+    listen = 1;     
 
 def drawQR(x,y,size,canvas):
     global root
@@ -232,6 +242,7 @@ def drawRobot(x,y,size,direction,xco,yco,canvas):
 
 def gui():
     global root
+    global direction
     entry = tk.Entry(root)
     stvar=tk.StringVar()
     stvar.set("one")
@@ -256,8 +267,9 @@ def gui():
             dx = canvas_width/x
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
-
-    drawRobot(dx,dy,dx/2,"West",robotX,robotY,canvas)
+    
+    
+    drawRobot(dx,dy,dx/2,direction,robotX,robotY,canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
 
