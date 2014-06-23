@@ -103,7 +103,7 @@ public class MainActivity extends ServiceActivity {
     private boolean previewing = true;
 
     // Initialize variables for bluetooth connection
-    private String deviceAddress = "44:6D:75:96:64:F7";
+    private String deviceAddress = "44:6D:57:96:64:F7";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
 
     // Device address Floris:   44:6D:75:96:64:F7
