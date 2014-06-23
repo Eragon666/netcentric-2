@@ -35,7 +35,7 @@ global quit
 
 global server_sock
 server_sock=BluetoothSocket(RFCOMM)
-server_sock.bind(("",1))
+server_sock.bind(("",PORT_ANY))
 server_sock.listen(1)
 
 port = server_sock.getsockname()[1]
