@@ -46,4 +46,4 @@ Vandaag hebben we onderzocht hoe het probleem dat we slechts een robot tegelijk 
    1. De MasterApp op de laptop uitbreiden zodat er twee mobiele apparaten via Bluetooth verbonden kunnen worden.
    2. Terug naar het framework en nog een mobiel apparaat tussen de MasterApp op de laptop en de SlaveApps op de robot/MBED.
    3. Overstappen van Bluetooth naar WiFi.
-Aangezien optie twee waarschijnlijk teveel tijd gaat kosten, gaan we proberen om optie een nog te implementeren. De onzekerheid ligt in de korte tijd tot de deadline.
+Aangezien optie twee en drie waarschijnlijk teveel tijd gaat kosten, gaan we proberen om optie een nog te implementeren. De onzekerheid ligt in de korte tijd tot de deadline. Mocht vroeg in het proces blijken dat we inderdaad te weinig tijd hebben, dan kunnen eventueel stap twee nog proberen.
