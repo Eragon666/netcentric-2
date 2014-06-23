@@ -10,8 +10,8 @@ import re
 canvas_width = 600
 canvas_height = 600
 
-x = 3
-y = 3
+x = 4
+y = 4
 
 global robotX
 robotX = 0
@@ -19,6 +19,7 @@ global robotY
 robotY = 0
 global ID
 ID = 0
+
 
 #Listen to bluetooth connection boolean
 listen = 1;
@@ -53,7 +54,7 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
-    currentLocation = "[0, 0]"
+    currentLocation = "[1, 1]"
     direction = "None"
     confirmation = "False"
 
@@ -112,8 +113,10 @@ def listenBluetooth():
                             client_sock.send("confirmation: " + confirmation)
                         else:
                             client_sock.send("currentLocation: " + currentLocation)
+                    print data
+                    parser(data)
                     gui()
-                print("received [%s]" % data)
+                    print("received [%s]" % data)
             except IOError:
                 pass
 
@@ -151,15 +154,16 @@ def drawQR(x,y,size,canvas):
             else:
                 color="white"
             nexty = nexty+dsize
-            figure=canvas.create_rectangle(nextx,nexty,nextx+dsize,nexty+dsize, fill=color)
+            figure=canvas.create_rectangle(nextx,canvas_height-nexty,nextx+dsize,canvas_height-nexty+dsize, fill=color)
         nexty = y
 
 def drawRobot(x,y,size,direction,xco,yco,canvas):
-	x *= xco
-	y *= yco
-	x += size/8
-	y+= size/8
-	figure=canvas.create_rectangle(x,y,x+size/4,y+size/4, fill="yellow")
+    xco -= 1
+    yco -= 1
+    x *= xco
+    y *= yco
+    
+    figure=canvas.create_rectangle(x+size,canvas_height-y,x+size/8,canvas_height-y+size/8, fill="yellow")
 
 #def parser(self, data):
     #for s in data:
@@ -175,7 +179,7 @@ def gui():
     stvar.set("one")
 
     canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
-    canvas.grid(row=0,column=1,padx=10)
+    canvas.grid(row=0,column=1,ipadx=10,ipady=10)
 
     #frame = Frame(self.root)
     #frame.grid(row=0,column=0, sticky="n")
@@ -195,7 +199,7 @@ def gui():
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
 
-    drawRobot(dx,dy,300,1,robotX,robotY,canvas)
+    drawRobot(dx,dy,dx/2,1,robotX,robotY,canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
 
@@ -214,11 +218,19 @@ def handler(self):
 def parser(data):
     global robotX, robotY, ID
     extract = re.findall(r'\d+',data)
-    print extract
-    robotX = int(extract[0])
-    robotY = int(extract[1])
-    ID = int(extract[2])
-    #Locatie: [1, 1]; Robot-ID: 21;
+    if extract:
+        print "poep"
+        print extract
+        print "poep2"
+        robotX = int(extract[0])
+        robotY = int(extract[1])
+        ID = int(extract[2])
+        #Locatie: [1, 1]; Robot-ID: 21;
+    else:
+        m = re.search('direction: (.+?)', data)
+        if m:
+            found = m.group(1)
+            print found
         
 if __name__== '__main__':
     global quit
