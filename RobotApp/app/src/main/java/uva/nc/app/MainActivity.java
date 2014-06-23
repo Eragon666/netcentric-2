@@ -442,7 +442,7 @@ public class MainActivity extends ServiceActivity {
                 currentLocation = Input.replace("currentLocation: ", "");
 
                 Log.i("Masterserver", "currenLocation: " + currentLocation);
-                //scanText.setText("Current Location: " + currentLocation);
+
                 if (roaming) {
                     direction = RandomDirection();
                     Log.i("Masterserver", "RandomDirection");
@@ -451,12 +451,11 @@ public class MainActivity extends ServiceActivity {
                     Log.i("Masterserver", "KorstePadSolver");
                 }
 
-                logComm.append("Sent direction to master: " + confirmation);
                 SendMessage("direction: " + direction);
             } else if (Input.contains("confirmation: ")) {
                 /* Hier wordt de confirmation ontvangen. */
                 confirmation = Input.replace("confirmation: ", "");
-                logComm.append("Direction is free?: " + confirmation);
+                logComm.append("* Direction is free\n");
 
                 if (confirmation.equals("True")) {
                     float[] args = new float[1];
@@ -529,7 +528,7 @@ public class MainActivity extends ServiceActivity {
 
             try {
                 connection.write(b);
-                logComm.append("* Sent " + Message + "to master\n");
+                logComm.append("* Sent " + Message + " to master\n");
             } catch (IOException e) {
                 Log.e("Masterserver", "Error with write");
             }
@@ -583,8 +582,9 @@ public class MainActivity extends ServiceActivity {
             byte[] b = Message.getBytes(Charset.forName("UTF-8"));
 
             try {
+                Log.i("message", Message);
                 connection.write(b);
-                logComm.append("* Sent " + Message + "to master\n");
+                logComm.append("* Sent " + Message + " to master\n");
             } catch (IOException e) {
                 Log.e("Masterserver", "Error with write");
             }
@@ -607,11 +607,12 @@ public class MainActivity extends ServiceActivity {
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
                     String QRdata = sym.getData();
+
+                    Log.i("message", QRdata);
+
                     scanText.setText("QR-Code: " + QRdata);
 
                     SendMessage("QRdata: " + QRdata);
-
-                    logComm.append("* Scanned:"+ QRdata + "\n");
 
                     barcodeScanned = true;
                 }
@@ -679,7 +680,7 @@ public class MainActivity extends ServiceActivity {
                         if (values == null || values.length != 1) {
                             toastShort("Error!");
                         } else {
-                            logComm.append("* Finished driving, ok to scan\n");
+                            logComm.append("* Finished driving, activate QR scanner\n");
 
                             if((int)values[0] == 0) {
                                 if (barcodeScanned) {
