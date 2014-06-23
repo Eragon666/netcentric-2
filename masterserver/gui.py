@@ -1,8 +1,8 @@
 from threading import Thread
-#import Tkinter as tk
-import mtTkinter as tk
-#from Tkinter import *
-from mtTkinter import *
+import Tkinter as tk
+#import mtTkinter as tk
+from Tkinter import *
+#from mtTkinter import *
 from bluetooth import *
 import tkMessageBox
 import random
@@ -89,6 +89,7 @@ def listenBluetooth():
     global quit
     global client_sock, client_info
     client_sock, client_info = server_sock.accept()
+
     #thread1 = Thread(target = guiMain, args=client_sock)
     #thread1.start()
     #threads.append(thread1)    
@@ -124,10 +125,12 @@ def listenBluetooth():
 
 def guiMain():
     global root
+    global server_sock
     gui()
     #root.protocol("WM_DELETE_WINDOW", gui.handler)
     root.mainloop()
     print("disconnected");
+    server_sock.close()
 
 def exitGui():
     #global client_sock
