@@ -1,6 +1,8 @@
 from threading import Thread
-import Tkinter as tk
-from Tkinter import *
+#import Tkinter as tk
+import mtTkinter as tk
+#from Tkinter import *
+from mtTkinter import *
 from bluetooth import *
 import tkMessageBox
 import random
