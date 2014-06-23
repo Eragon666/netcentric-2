@@ -161,7 +161,7 @@ def connect():
     global client_sock, client_info
     client_sock, client_info = server_sock.accept()
     print("Accepted connection from ", client_info)
-    
+
     listen = 1
 
 def drawQR(x,y,size,canvas):
