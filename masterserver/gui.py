@@ -1,8 +1,6 @@
 from threading import Thread
 import Tkinter as tk
-#import mtTkinter as tk
 from Tkinter import *
-#from mtTkinter import *
 from bluetooth import *
 import tkMessageBox
 import random
@@ -37,8 +35,10 @@ global quit
 
 global server_sock
 server_sock=BluetoothSocket(RFCOMM)
-server_sock.bind(("",PORT_ANY))
+server_sock.bind(("",1))
 server_sock.listen(1)
+
+port = server_sock.getsockname()[1]
 
 global client_sock
 
@@ -85,7 +85,7 @@ def listenBluetooth():
         return "True"
     
     global root
-    print "Waiting for connection"
+    print("Waiting for connection on RFCOMM channel %d" %port)
     global quit
     global client_sock, client_info
     client_sock, client_info = server_sock.accept()
@@ -259,9 +259,11 @@ if __name__== '__main__':
     thread.start()
     threads.append(thread)
     
-    thread1 = Thread(target = guiMain)
-    thread1.start()
-    threads.append(thread1)
+    guiMain()
+
+    #thread1 = Thread(target = guiMain)
+    #thread1.start()
+    #threads.append(thread1)
     
 
     
