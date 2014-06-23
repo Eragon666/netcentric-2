@@ -71,27 +71,49 @@ def listenBluetooth():
     confirmation = "False"
 
     ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
-
+    OccupiedLocations = [[0 for x in xrange(4)] for x in xrange(4)] 
+    for i in range(4):
+        OccupiedLocations[3][i] = 1
+        OccupiedLocations[i][3] = 1
+    
+    
+    
     def Confirm(currentLocation, direction):
         # Also needs a global array with all the reserved locations.
         # Currently named: 'ReservedLocations' */
         # Initialize 'newPosition' based on parameters.
         newPostion = ""
+        newX = 0
+        newY = 0
         test = currentLocation.replace("Locatie: ", "")
         currentX = int(test[1])
         currentY = int(test[4])
         if direction == "North":
-            newPosition = "[" + str(currentX) + ", " + str(currentY + 1) + "]"
+            #newPosition = "[" + str(currentX) + ", " + str(currentY + 1) + "]"
+            newX = currentX
+            newY = currentY + 1
         elif direction == "East":
-            newPosition = "[" + str(currentX + 1) + ", " + str(currentY) + "]"
+            #newPosition = "[" + str(currentX + 1) + ", " + str(currentY) + "]"
+            newX = currentX + 1
+            newY = currentY
         elif direction == "South":
-            newPosition = "[" + str(currentX) + ", " + str(currentY - 1) + "]"
+            #newPosition = "[" + str(currentX) + ", " + str(currentY - 1) + "]"
+            newX = currentX
+            newY = currentY - 1
         elif direction == "West":
-            newPosition = "[" + str(currentX - 1) + ", " + str(currentY) + "]"
-            
-        if newPosition in ReservedLocations:
+            #newPosition = "[" + str(currentX - 1) + ", " + str(currentY) + "]"
+            newX = currentX - 1
+            newY = currentY
+          
+        if OccupiedLocations[newX][newY] == 1:
+            print "locations array"
             return "False"
-        
+              
+        newPosition = "[" + str(newX) + ", " + str(newY) + "]"
+        if newPosition in ReservedLocations:
+            print "locations string"
+            return "False"
+              
         return "True"
     
     global root
