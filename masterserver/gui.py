@@ -23,6 +23,8 @@ robotY = 0
 global ID
 ID = 0
 
+global direction
+direction = "None"
 global clients
 clients = []
 
@@ -62,7 +64,7 @@ advertise_service( server_sock, "SampleServer",
 
 def listenBluetooth():
     currentLocation = "[1, 1]"
-    direction = "None"
+    global direction
     confirmation = "False"
 
     ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
@@ -236,6 +238,7 @@ def drawRobot(x,y,size,direction,xco,yco,canvas):
 
 def gui():
     global root
+    global direction
     entry = tk.Entry(root)
     stvar=tk.StringVar()
     stvar.set("one")
@@ -261,7 +264,7 @@ def gui():
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
 
-    drawRobot(dx,dy,dx/2,"West",robotX,robotY,canvas)
+    drawRobot(dx,dy,dx/2,direction,robotX,robotY,canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
 
