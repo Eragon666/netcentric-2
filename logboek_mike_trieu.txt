@@ -64,4 +64,11 @@ Netcentric Computing - Labreport Week 2-4
 - Code schoongemaakt, bluetooth functies van framework verwijdert
 
 20/6/2014
+- Rare bug
+
+23/6/2014
+- Rare bug gefixed
+- Meerdere slaves mogelijk gemaakt in de master app [met patrick, floris]
+
+24/6/2014
 - 
