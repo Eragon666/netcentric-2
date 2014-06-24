@@ -23,9 +23,17 @@ robotY = 0
 global ID
 ID = 0
 
+global OccupiedLocations
+OccupiedLocations = [[0 for x in xrange(5)] for x in xrange(5)] 
+for i in range(5):
+        OccupiedLocations[4][i] = 1
+        OccupiedLocations[0][i] = 1
+        OccupiedLocations[i][4] = 1
+        OccupiedLocations[i][0] = 1
+        
+
 global robots
 robots = {}
-
 global direction
 direction = "None"
 global clients
@@ -66,16 +74,14 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
+    global robots
     currentLocation = "[1, 1]"
     robot_id = ""
     global direction
+    global OccupiedLocations
     confirmation = "False"
 
     ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
-    OccupiedLocations = [[0 for x in xrange(4)] for x in xrange(4)] 
-    for i in range(4):
-        OccupiedLocations[3][i] = 1
-        OccupiedLocations[i][3] = 1
     
     
     
@@ -114,7 +120,14 @@ def listenBluetooth():
         if newPosition in ReservedLocations:
             print "locations string"
             return "False"
-              
+        
+        
+        OccupiedLocations[newX][newY] = 1
+        OccupiedLocations[currentX][currentY] = 0
+        
+        for i in range(5):
+            print OccupiedLocations[i]
+            
         return "True"
     
     global root
@@ -299,9 +312,9 @@ def gui():
             dx = canvas_width/x
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
-    
-    
-    drawRobot(dx,dy,dx/2,direction,robotX,robotY,canvas)
+
+    for key, value in robots.items():
+        drawRobot(dx,dy,dx/2,value[3],value[1],value[2],canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
 

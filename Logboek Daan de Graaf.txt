@@ -16,7 +16,7 @@ Toen kwam matthijs met een usb adapter en die maakte bluetooth verbinding via py
 
 Vrijdag 13-6:
 
-
+Afgebeld
 
 Maandag 16-6:
 
@@ -26,4 +26,17 @@ Dinsdag 17-6:
 
 Vandaag gaan we verder met de GUI en eventueel proberen wat bij elkaar te voegen voor het te onoverzichtelijk word.
 
-Woensdag 18-6
+Woensdag 18-6:
+
+Bluetooth werkt helemaal
+
+Donderdag 19-6:
+
+
+Vrijdag 20-6:
+
+De hele structuur van de Gui code veranderd, eerst was er een Gui class. Maar dit zorgte voor problemen met threads en functies die buiten de class stonden. We hebben er voor gekozen om de gui code in een functie te zetten.
+
+Maandag 23-6:
+Robot kan naar een direction draaien, Robot print nu goed voor elke grid. Robot is een driehoek met de punt in de direction.
+Foto's gemaakt van de opstelling en begonnen aan de poster.
