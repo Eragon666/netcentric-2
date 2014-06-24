@@ -356,7 +356,7 @@ def parser(data, addr):
         robots[addr] = [ID,robotX,robotY,direction,"red"]
         #Locatie: [1, 1]; Robot-ID: 21;
     else:
-        m = re.search('direction: (.+?)', data)
+        m = re.search('direction: (.+*)', data)
         if m:
             found = m.group(1)
             robots[addr][3] = found
