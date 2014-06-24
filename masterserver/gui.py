@@ -15,21 +15,21 @@ canvas_width = 600
 canvas_height = 600
 
 global x
-x = 6
+x = 10
 global y
-y = 6
+y = 10
 
 global OccupiedLocations
-OccupiedLocations = [[0 for i in xrange(5)] for i in xrange(5)] 
-for i in range(5):
-        OccupiedLocations[4][i] = 1
+OccupiedLocations = [[0 for i in xrange(x+1)] for i in xrange(x+1)] 
+for i in range(x+1):
+        OccupiedLocations[x][i] = 1
         OccupiedLocations[0][i] = 1
-        OccupiedLocations[i][4] = 1
+        OccupiedLocations[i][x] = 1
         OccupiedLocations[i][0] = 1
 
 global robot_list
 robot_list = []
-for i in range(1,37):
+for i in range(1,x*y+1):
         robot_list.append([i, ''])
         
 
@@ -314,10 +314,6 @@ def gui():
 
     for i in range(x):
         for j in range(y):
-            print "x:"
-            print x
-            print "y"
-            print y
             dx = canvas_width/x
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
@@ -346,13 +342,11 @@ def handler(self):
 def parser(data, addr):
     extract = re.findall(r'\d+',data)
     if extract:
-        print "poep"
         print extract
-        print "poep2"
         robotX = int(extract[0])
         robotY = int(extract[1])
         ID = int(extract[2])
-        direction = "East"
+        direction = "North"
         robots[addr] = [ID,robotX,robotY,direction,"red"]
         #Locatie: [1, 1]; Robot-ID: 21;
     else:
