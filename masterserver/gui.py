@@ -356,10 +356,19 @@ def parser(data, addr):
         robots[addr] = [ID,robotX,robotY,direction,"red"]
         #Locatie: [1, 1]; Robot-ID: 21;
     else:
-        m = re.search('direction: (.+*)', data)
+        m = re.search('direction: (.+?)', data)
         if m:
             found = m.group(1)
-            robots[addr][3] = found
+            if found == "N":
+                robots[addr][3] = "North"
+            elif found == "W":
+                robots[addr][3] = "West"
+            elif found == "E":
+                robots[addr][3] = "East"
+            elif found == "S":
+                robots[addr][3] = "South"
+            else:
+                robots[addr][3] = "None"
         
 if __name__== '__main__':
     global quit
