@@ -10,7 +10,6 @@ Donderdag 12-6:
 
 - Gebruik van serialport om met een usb aangesloten device te communiceren die als bluetooth adapter werkt.
 - Het geheel blijft zo crossplatform
-
 Om het geheel toch crossplatform te houden, kozen xander en ik ervoor om via usb contact te maken met de telefoon en vervolgens de telefoon te gebruiken als bluetooth ontvanger. Ook dit deden we met processing omdat je android apps kon maken. Maar ook hier kwamen we beiden niet verder dan het installeren van android packages voor processing. 
 Toen kwam matthijs met een usb adapter en die maakte bluetooth verbinding via python op linux. Helaas kunnen we alleen zijn laptop hiervoor gebruiken, want pybluez is niet voor mac.
 
@@ -21,22 +20,33 @@ Afgebeld
 Maandag 16-6:
 
 Vandaag ben ik begonnen met de GUI, dit doen we met python met Tkinter. Eerst moest ik even inkomen, maar al gauw heb ik het onder de knie.
+Het is een window met een canvas waar op getekend kan worden. Daarnaast is er een button en een input field die gebruikt kunnen worden om iets te submitten.
 
 Dinsdag 17-6:
 
 Vandaag gaan we verder met de GUI en eventueel proberen wat bij elkaar te voegen voor het te onoverzichtelijk word.
+Ik heb een functie gemaakt die een grid print van opgegeven afmetingen. Dit wordt op het canvas getekend en een coordinaat wordt gerepresenteerd als een soort qr code.
+Daarnaast is er een functie die een robot print (geel vierkantje). Deze werkt nog vrij buggie, maar was nodig om al wat tests te doen.
 
 Woensdag 18-6:
 
-Bluetooth werkt helemaal
+Bluetooth werkt helemaal, deze is in de gui code verwertk. Zelf kan ik niet meer op mijn laptop werken omdat pybluez geen mac ondersteuning heeft.
+Vanaf nu werk ik samen met xander op zijn laptop.
+We zijn begonnen bij het netjes afhandelen van processen als bijvoorbeeld het programma afsluit, of de app, of als er geen connectie meer is.
+Vervolgens besloten we een eigen thread te maken voor de bluetooth die constant luistert en connectie houdt.
 
 Donderdag 19-6:
 
+Met de nieuwe app wordt de huidige locatie verstuurd naar onze gui en de robot verplaatst dan naar die locatie (op het scherm)
+We hebben een parser gemaakt die de binnenkomende informatie van de robot die een qr code scant uitleest.
 
-Vrijdag 20-6:
+Vrijdag 20-6: 
 
 De hele structuur van de Gui code veranderd, eerst was er een Gui class. Maar dit zorgte voor problemen met threads en functies die buiten de class stonden. We hebben er voor gekozen om de gui code in een functie te zetten.
 
 Maandag 23-6:
+
 Robot kan naar een direction draaien, Robot print nu goed voor elke grid. Robot is een driehoek met de punt in de direction.
 Foto's gemaakt van de opstelling en begonnen aan de poster.
+
+Dinsdag 24-6:
