@@ -249,8 +249,8 @@ def drawQR(canvas):
             figure=canvas.create_rectangle(nextx,canvas_height-nexty,nextx+dsize,canvas_height-nexty+dsize, fill=color)
         nexty = y
 ''' 
-    dx = canvas_width/x 
-    dy = canvas_height/y 
+    dx = canvas_width/x
+    dy = canvas_height/y
     size = dx/2
     
     for i in range(x):
@@ -332,7 +332,7 @@ def parser(data, addr):
         ID = int(extract[2])
         direction = "North"
         robots[addr] = [ID,robotX,robotY,direction,"red"]
-        blocks[(robotX, robotY)] = [True, addr]
+        blocks[(robotX-1, robotY-1)] = [True, addr]
     else:
         m = re.search('direction: (.+?)', data)
         if m:
