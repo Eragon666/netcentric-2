@@ -489,35 +489,6 @@ public class MainActivity extends ServiceActivity {
             Log.i("Masterserver", "Message: " + message);
         }
 
-        String[] ReservedLocations = {"[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"};
-        //ReservedLocations[3] = "[1, 2]";
-
-        //TODO: remove for final version
-        public String Confirm(String currentLocation, String direction) {
-            /* Also needs a global array with all the reserved locations.
-             * Currently named: 'ReservedLocations' */
-            // Initialize 'newPosition' based on parameters.
-            String newPosition = "";
-            String test = currentLocation.replace("Locatie: ", "");
-            Log.e("Within Confirm", "currentLocation: " + test);
-            Log.e("Within Confirm", "direction: " + direction);
-            int currentX = Integer.valueOf(String.valueOf(test.charAt(1)));
-            int currentY = Integer.valueOf(String.valueOf(test.charAt(4)));
-            if (direction.equals("North"))
-                newPosition = "[" + currentX + ", " + (currentY + 1) + "]";
-            else if (direction.equals("East"))
-                newPosition = "[" + (currentX + 1) + ", " + currentY + "]";
-            else if (direction.equals("South"))
-                newPosition = "[" + currentX + ", " + (currentY - 1) + "]";
-            else if (direction.equals("West"))
-                newPosition = "[" + (currentX - 1) + ", " + currentY + "]";
-            Log.e("Within Confirm", "newPosition: " + newPosition);
-            if(Arrays.asList(ReservedLocations).contains(newPosition)) {
-                return "False";
-            }
-            return "True";
-        }
-
         public String RandomDirection() {
             int direction = 1 + (int)(Math.random() * ((4 - 1) + 1));
             if (direction == 1)
@@ -538,6 +509,10 @@ public class MainActivity extends ServiceActivity {
             int currentY = Integer.valueOf(String.valueOf(currentLocation.charAt(4)));
             int finalX = Integer.valueOf(String.valueOf(finalDestination.charAt(1)));
             int finalY = Integer.valueOf(String.valueOf(finalDestination.charAt(4)));
+
+            if (Math.abs(finalX - currentX) == 0 && Math.abs(finalY - currentY) == 0) {
+                return "Done";
+            }
 
             if (Math.abs(finalX - currentX) > Math.abs(finalY - currentY)) {
                 if (finalX > currentX)
