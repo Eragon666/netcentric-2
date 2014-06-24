@@ -17,9 +17,6 @@ canvas_height = 600
 x = 4
 y = 4
 
-global ID
-ID = 0
-
 global OccupiedLocations
 OccupiedLocations = [[0 for x in xrange(5)] for x in xrange(5)] 
 for i in range(5):
@@ -36,8 +33,7 @@ for i in range(1,10):
 
 global robots
 robots = {}
-global direction
-direction = "None"
+
 global clients
 clients = []
 
