@@ -127,9 +127,6 @@ def listenBluetooth():
         
         OccupiedLocations[newX][newY] = 1
         OccupiedLocations[currentX][currentY] = 0
-        
-        for i in range(5):
-            print OccupiedLocations[i]
             
         return "True"
     
@@ -151,7 +148,6 @@ def listenBluetooth():
             if s == server_sock:
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
-                print("Accepted connection from ", addr)
                 #robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
 
@@ -161,8 +157,7 @@ def listenBluetooth():
                         
                 robot_list[random_val][1] = addr[0]
                 robot_list[random_val][2] = conn
-                print "robotid: ", robot_list[random_val][0]
-                print robot_list
+                print("Accepted connection from ", addr, "with robotid: ", robot_list[random_val][0])
             else:
                 data = s.recv(1024)
                 if data:
