@@ -82,7 +82,6 @@ advertise_service( server_sock, "SampleServer",
 def listenBluetooth():
     global robots
     currentLocation = "[1, 1]"
-    robot_id = ""
     global direction
     global OccupiedLocations
     confirmation = "False"
@@ -164,26 +163,17 @@ def listenBluetooth():
                 if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
-                        currentLocation = QRdata[9:15]
-                        robot_id = QRdata[27:29]
-                        
+                        currentLocation = QRdata.replace("Locatie: ", "").replace("; Robot-ID: 21;", "")
                         s.send("currentLocation: " + currentLocation)
                     elif "direction: " in data:
                         direction = data.replace("direction: ", "")
-
-                        #Close connection when robot is on final location
-                        if direction == "Done":
-                            print "connection", addr, "closed"
-                            s.close()
-                            read.remove(s)
-                            
                         confirmation = Confirm(currentLocation, direction)
                         if confirmation =="True":
                             s.send("confirmation: " + confirmation)
                         else:
                             s.send("currentLocation: " + currentLocation)
                     print data
-                    parser(data)
+                    parser(data, addr)
                     gui()
                     print("received [%s]" % data)
                 else:
@@ -321,6 +311,9 @@ def gui():
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
 
+    for keys,values in robots.items():
+        print(keys)
+        print(values)
     for key, value in robots.items():
         drawRobot(dx,dy,dx/2,value[3],value[1],value[2],canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
@@ -339,7 +332,7 @@ def handler(self):
         self.root.quit()
         print "3"
         
-def parser(data):
+def parser(data, addr):
     global robotX, robotY, ID
     extract = re.findall(r'\d+',data)
     if extract:
@@ -349,12 +342,14 @@ def parser(data):
         robotX = int(extract[0])
         robotY = int(extract[1])
         ID = int(extract[2])
+        direction = "East"
+        robots[addr] = [ID,robotX,robotY,direction,"red"]
         #Locatie: [1, 1]; Robot-ID: 21;
     else:
         m = re.search('direction: (.+?)', data)
         if m:
             found = m.group(1)
-            print found
+            robots[addr][3] = found
         
 if __name__== '__main__':
     global quit
