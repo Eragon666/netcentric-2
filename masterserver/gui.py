@@ -256,7 +256,7 @@ def drawQR(canvas):
     for i in range(x):
         for j in range(y):
             if (blocks[(i,j)][0]):
-                figure = canvas.create_rectangle(dx*i, canvas_height-dy*j, dx*i+size, canvas_height-dy*j+size, fill="white")
+                figure = canvas.create_rectangle(dx*i, canvas_height-dy*j, dx*i+size, canvas_height-dy*j-size, fill="white")
         
 def drawRobot(direction,xco,yco,canvas):
     xco -= 1
