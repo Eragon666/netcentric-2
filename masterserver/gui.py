@@ -15,9 +15,9 @@ canvas_width = 600
 canvas_height = 600
 
 global x
-x = 10
+x = 4
 global y
-y = 10
+y = 4
 
 global OccupiedLocations
 OccupiedLocations = [[0 for i in xrange(x+1)] for i in xrange(x+1)] 
@@ -29,8 +29,9 @@ for i in range(x+1):
 
 global robot_list
 robot_list = []
+
 for i in range(1,x*y+1):
-        robot_list.append([i, ''])
+        robot_list.append([i, '', ''])
         
 
 global robots
@@ -75,6 +76,8 @@ advertise_service( server_sock, "SampleServer",
 
 def listenBluetooth():
     global robots
+    global x
+    global y
     currentLocation = "[1, 1]"
     robot_id = ""
     global direction
@@ -124,9 +127,6 @@ def listenBluetooth():
         
         OccupiedLocations[newX][newY] = 1
         OccupiedLocations[currentX][currentY] = 0
-        
-        for i in range(5):
-            print OccupiedLocations[i]
             
         return "True"
     
@@ -148,18 +148,31 @@ def listenBluetooth():
             if s == server_sock:
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
-                print("Accepted connection from ", addr)
                 #robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
 
-                robot_list[randint(1,10)][1] = addr
+                random_val = randint(0,x*y-1)
+                while robot_list[random_val][1] != '':
+                        random_val = randint(0,x*y-1)
+                        
+                robot_list[random_val][1] = addr[0]
+                robot_list[random_val][2] = conn
+                print("Accepted connection from ", addr, "with robotid: ", robot_list[random_val][0])
             else:
                 data = s.recv(1024)
                 if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
                         currentLocation = QRdata[9:15]
-                        robot_id = QRdata[27:29]
+                        robot_id = QRdata[27:28]
+
+                        for mac in robot_list:
+                                if mac[0] == int(robot_id):
+                                        for write in writable:
+                                                if write == mac[2]:
+                                                        print "Sent message to ", write
+                                                        write.send("finalDestination: " + currentLocation)
+                                        
                         
                         s.send("currentLocation: " + currentLocation)
                     elif "direction: " in data:
@@ -170,6 +183,7 @@ def listenBluetooth():
                             print "connection", addr, "closed"
                             s.close()
                             read.remove(s)
+                            break
                             
                         confirmation = Confirm(currentLocation, direction)
                         if confirmation =="True":
@@ -181,9 +195,15 @@ def listenBluetooth():
                     gui()
                     print("received [%s]" % data)
                 else:
-                    print "connection", addr, "closed"
-                    s.close()
-                    read.remove(s) 
+                    for mac in robot_list:
+                                if mac[2] == s:
+                                        print "connection", mac[1], "closed"
+                                        
+                                        mac[1] = ''
+                                        mac[2] = ''
+                        
+                                        s.close()
+                                        read.remove(s)
 
 def guiMain():
     global root
@@ -289,12 +309,9 @@ def handler(self):
         #client_sock.close()
         #server_sock.close()
         exitGui()
-        print "1"
         quit = True
-        print "2"
         print("vamos a la playa")
         self.root.quit()
-        print "3"
         
 def parser(data, addr):
     extract = re.findall(r'\d+',data)
@@ -305,7 +322,6 @@ def parser(data, addr):
         ID = int(extract[2])
         direction = "North"
         robots[addr] = [ID,robotX,robotY,direction,"red"]
-        #Locatie: [1, 1]; Robot-ID: 21;
     else:
         m = re.search('direction: (.+?)', data)
         if m:
@@ -325,19 +341,12 @@ if __name__== '__main__':
     global quit
     global client_sock, client_info
     quit = False
+    
     thread = Thread(target = listenBluetooth)
     thread.start()
     threads.append(thread)
     
     guiMain()
-
-    #thread1 = Thread(target = guiMain)
-    #thread1.start()
-    #threads.append(thread1)
-    
-
     
     for thread in threads:
         thread.join()
-
-    #client_sock.close()

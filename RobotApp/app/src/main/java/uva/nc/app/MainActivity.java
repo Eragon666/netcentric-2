@@ -1,7 +1,5 @@
 package uva.nc.app;
 
-import uva.nc.app.CameraPreview;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -21,16 +19,12 @@ import android.widget.TextView;
 import android.content.pm.ActivityInfo;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.Math;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.UUID;
 
 import uva.nc.ServiceActivity;
 import uva.nc.bluetooth.BluetoothService;
-import uva.nc.bluetooth.MasterManager;
-import uva.nc.bluetooth.SlaveManager;
 import uva.nc.mbed.MbedManager;
 import uva.nc.mbed.MbedRequest;
 import uva.nc.mbed.MbedResponse;
@@ -42,7 +36,6 @@ import android.view.View.OnClickListener;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.AutoFocusCallback;
-import android.hardware.Camera.Parameters;
 
 /* Import ZBar Class files */
 import net.sourceforge.zbar.ImageScanner;
@@ -64,9 +57,9 @@ public class MainActivity extends ServiceActivity {
     private TextView listenerStatusText;
     private TextView ownAddressText;
     private Button listenerButton;
-    private Button disconnectMaster;
+    private Button disconnectButton;
 
-    // mBed controls.
+    // mBed Controls.
     private TextView mbedConnectedText;
 
     // Layout Controls
@@ -75,53 +68,61 @@ public class MainActivity extends ServiceActivity {
     private Button showDebugLayout;
     private Button showManualLayout;
 
-    // Layout variables to identify the frames
+    // Layout Frames
     private LinearLayout cameraLayout;
     private LinearLayout mbedLayout;
     private LinearLayout debugLayout;
     private LinearLayout manualLayout;
 
-    // Declare monitoring log variable
+    // Manual Drive Controls
+    private Button driveForward;
+    private Button driveBackward;
+    private Button driveLeft;
+    private Button driveRight;
+
+    // Logging TextView
     private TextView logComm;
 
     // Accessory to connect to when service is connected.
     private UsbAccessory toConnect;
 
-    //Declare variables for the Camera and QR scanner
+    // Camera Variables
     private Camera mCamera;
     private CameraPreview mPreview;
     private Handler autoFocusHandler;
 
-    // QR scanner controls
-    TextView scanText;
-    Button scanButton;
-
+    // QR scanner Variables
     ImageScanner scanner;
 
-    // Initialize variables for the QR scanner
     private boolean barcodeScanned = false;
     private boolean previewing = true;
 
+    // Load QR scanner library
+    static {
+        System.loadLibrary("iconv");
+    }
+
+    // QR scanner Controls
+    TextView scanText;
+    Button scanButton;
+
     // Initialize variables for bluetooth connection
-    private String deviceAddress = "00:09:DD:50:8D:2A";
+
+    /****
+     * Device address Floris:   44:6D:57:96:64:F7
+     * Device address Matthijs: 00:15:83:15:A3:10
+     * Device address Mike:     44:6D:57:4A:81:D4
+     * Device address Patrick:  A4:17:31:ED:18:F8
+     * Device address Xander:   00:09:DD:50:8D:2A
+     */
+    private String deviceAddress = "44:6D:57:4A:81:D4";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
-
-    // Device address Floris:   44:6D:57:96:64:F7
-    // Device address Matthijs: 00:15:83:15:A3:10
-    // Device address Mike:     44:6D:57:4A:81:D4
-    // Device address Patrick:  A4:17:31:ED:18:F8
-    // Device address Xander:   00:09:DD:50:8D:2A
-
     private BluetoothAdapter BA;
     private BluetoothThread connection;
 
     BluetoothDevice device;
     BluetoothSocket socket;
 
-    // Load QR scanner library
-    static {
-        System.loadLibrary("iconv");
-    }
 
 
     @Override
@@ -130,16 +131,85 @@ public class MainActivity extends ServiceActivity {
         setContentView(R.layout.activity_main);
         attachControls();
 
-        // Attach logging TextView
-        logComm = (TextView)findViewById(R.id.log_comm);
-
         //Bluetooth initialize
         device = BluetoothAdapter.getDefaultAdapter().
                 getRemoteDevice(deviceAddress);
 
+        // If this intent was started with an accessory, store it temporarily and clear once connected.
+        UsbAccessory accessory = getIntent().getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
+        if (accessory != null) {
+            this.toConnect = accessory;
+        }
+
         /***
-         * Attach layout buttons
+         * Code for QR scanner
+         * Source: ZBarAndroidSDK-0.2 example
          **/
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        autoFocusHandler = new Handler();
+        mCamera = getCameraInstance();
+
+        /* Instance barcode scanner */
+        scanner = new ImageScanner();
+        scanner.setConfig(0, Config.X_DENSITY, 3);
+        scanner.setConfig(0, Config.Y_DENSITY, 3);
+
+        // Add camera preview to layout
+        mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
+        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
+        preview.addView(mPreview);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        registerReceiver(receiver, receiver.getIntentFilter());
+
+        refreshBluetoothControls();
+        refreshMbedControls();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        releaseCamera();
+
+        unregisterReceiver(receiver);
+    }
+
+
+    @Override
+    protected void onBluetoothReady(BluetoothService bluetooth) {
+        refreshBluetoothControls();
+    }
+
+    @Override
+    protected void onMbedReady(MbedService mbed) {
+        if (toConnect != null) {
+            mbed.manager.attach(toConnect);
+            toConnect = null;
+        }
+        refreshMbedControls();
+    }
+
+
+    private void attachControls() {
+        // Bluetooth controls.
+        ownAddressText = (TextView)findViewById(R.id.own_address);
+        listenerStatusText = (TextView)findViewById(R.id.listener_status);
+        listenerButton = (Button)findViewById(R.id.listener);
+        disconnectButton = (Button)findViewById(R.id.disconnect);
+
+        // Mbed controls
+        mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
+
+        // Logging TextView
+        logComm = (TextView)findViewById(R.id.log_comm);
+
+        // Layout controls
         cameraLayout = (LinearLayout)findViewById(R.id.camera_layout);
         showCameraLayout = (Button)findViewById(R.id.show_camera_layout);
         showCameraLayout.setOnClickListener(new OnClickListener() {
@@ -217,78 +287,7 @@ public class MainActivity extends ServiceActivity {
             }
         });
 
-        // TODO temporary random direction button, will be automated
-        Button tempButton = (Button)findViewById(R.id.temp);
-        tempButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                float[] args = new float[1];
-                args[0] = 1.0f;
-
-                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-
-                logComm.append("* Sent Drive forward message to mbed\n");
-            }
-        });
-        Button temp2Button = (Button)findViewById(R.id.temp2);
-        temp2Button.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                float[] args = new float[1];
-                args[0] = 2.0f;
-
-                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-
-                logComm.append("* Sent Drive backward message to mbed\n");
-            }
-        });
-        Button temp3Button = (Button)findViewById(R.id.temp3);
-        temp3Button.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                float[] args = new float[1];
-                args[0] = 3.0f;
-
-                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-
-                logComm.append("* Sent Drive left message to mbed\n");
-            }
-        });
-        Button temp4Button = (Button)findViewById(R.id.temp4);
-        temp4Button.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                float[] args = new float[1];
-                args[0] = 4.0f;
-
-                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
-
-                logComm.append("* Sent Drive right message to mbed\n");
-            }
-        });
-
-        // If this intent was started with an accessory, store it temporarily and clear once connected.
-        UsbAccessory accessory = getIntent().getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
-        if (accessory != null) {
-            this.toConnect = accessory;
-        }
-
-        /***
-         * Code for QR scanner
-         * Source: ZBarAndroidSDK-0.2 example
-         **/
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        autoFocusHandler = new Handler();
-        mCamera = getCameraInstance();
-
-        /* Instance barcode scanner */
-        scanner = new ImageScanner();
-        scanner.setConfig(0, Config.X_DENSITY, 3);
-        scanner.setConfig(0, Config.Y_DENSITY, 3);
-
-        // Add camera preview to layout
-        mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
-        preview.addView(mPreview);
-
-        // Attach scan controls
+        // QRscanner controls
         scanText = (TextView)findViewById(R.id.scanText);
         scanButton = (Button)findViewById(R.id.ScanButton);
         scanButton.setOnClickListener(new OnClickListener() {
@@ -303,52 +302,54 @@ public class MainActivity extends ServiceActivity {
                 }
             }
         });
+
+        // Manual robot controls
+        driveForward = (Button)findViewById(R.id.forward);
+        driveForward.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 1.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("* Sent Drive forward message to mbed\n");
+            }
+        });
+        driveBackward = (Button)findViewById(R.id.backward);
+        driveBackward.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 2.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("* Sent Drive backward message to mbed\n");
+            }
+        });
+        driveLeft = (Button)findViewById(R.id.left);
+        driveLeft.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 3.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("* Sent Drive left message to mbed\n");
+            }
+        });
+        driveRight = (Button)findViewById(R.id.right);
+        driveRight.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                float[] args = new float[1];
+                args[0] = 4.0f;
+
+                getMbed().manager.write(new MbedRequest(COMMAND_DRIVE, args));
+
+                logComm.append("* Sent Drive right message to mbed\n");
+            }
+        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        registerReceiver(receiver, receiver.getIntentFilter());
-
-        refreshBluetoothControls();
-        refreshMbedControls();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        releaseCamera();
-
-        unregisterReceiver(receiver);
-    }
-
-
-    @Override
-    protected void onBluetoothReady(BluetoothService bluetooth) {
-        refreshBluetoothControls();
-    }
-
-    @Override
-    protected void onMbedReady(MbedService mbed) {
-        if (toConnect != null) {
-            mbed.manager.attach(toConnect);
-            toConnect = null;
-        }
-        refreshMbedControls();
-    }
-
-
-    private void attachControls() {
-        // Bluetooth controls.
-        ownAddressText = (TextView)findViewById(R.id.own_address);
-        listenerStatusText = (TextView)findViewById(R.id.listener_status);
-        listenerButton = (Button)findViewById(R.id.listener);
-        disconnectMaster = (Button)findViewById(R.id.disconnect);
-
-        mbedConnectedText = (TextView)findViewById(R.id.mbed_connected);
-    }
 
     private void refreshBluetoothControls() {
         String slaveStatus = "Status not available";
@@ -381,7 +382,7 @@ public class MainActivity extends ServiceActivity {
                 }
             });
 
-            disconnectMaster.setOnClickListener(new OnClickListener() {
+            disconnectButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     try {
                         connection.cancel();
@@ -396,9 +397,21 @@ public class MainActivity extends ServiceActivity {
         listenerStatusText.setText(slaveStatus);
         listenerButton.setText(slaveButton);
         listenerButton.setEnabled(slaveButtonEnabled);
-        disconnectMaster.setEnabled(slaveButtonEnabled);
+        disconnectButton.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
     }
+
+    private void refreshMbedControls() {
+        String connText = getString(R.string.not_connected); // if you want to localize
+
+        MbedService mbed = getMbed();
+        if (mbed != null && mbed.manager.areChannelsOpen()) {
+            connText = getString(R.string.connected);
+        }
+
+        mbedConnectedText.setText(connText);
+    }
+
 
     private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
         String currentLocation = "[0, 0]";
@@ -438,6 +451,7 @@ public class MainActivity extends ServiceActivity {
                         /* Hier wordt de finalDestination ontvangen. */
                 finalDestination = Input.replace("finalDestination: ", "");
                 roaming = false;
+                logComm.append("* Received Final Destination\n");
             } else if (Input.contains("currentLocation: ")) {
                         /* Hier word de current location ontvangen*/
                 currentLocation = Input.replace("currentLocation: ", "");
@@ -541,21 +555,18 @@ public class MainActivity extends ServiceActivity {
     };
 
 
-    private void refreshMbedControls() {
-        String connText = getString(R.string.not_connected); // if you want to localize
-
-        MbedService mbed = getMbed();
-        if (mbed != null && mbed.manager.areChannelsOpen()) {
-            connText = getString(R.string.connected);
-        }
-
-        mbedConnectedText.setText(connText);
-    }
-
-
     /***
      * Functions for QR scanner
      * Source: ZBarAndroidSDK-0.2 example
+     *
+     * Copied:
+     *   getCamerainstance()
+     *   releaseCamera()
+     *   doAutoFocus()
+     *   autoFocusCB()
+     *
+     * Modified:
+     *   previewCb()
      **/
     public static Camera getCameraInstance(){
         Camera c = null;
