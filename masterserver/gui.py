@@ -15,9 +15,9 @@ canvas_width = 600
 canvas_height = 600
 
 global x
-x = 10
+x = 4
 global y
-y = 10
+y = 4
 
 global OccupiedLocations
 OccupiedLocations = [[0 for i in xrange(x+1)] for i in xrange(x+1)] 
@@ -289,12 +289,9 @@ def handler(self):
         #client_sock.close()
         #server_sock.close()
         exitGui()
-        print "1"
         quit = True
-        print "2"
         print("vamos a la playa")
         self.root.quit()
-        print "3"
         
 def parser(data, addr):
     extract = re.findall(r'\d+',data)
@@ -305,7 +302,6 @@ def parser(data, addr):
         ID = int(extract[2])
         direction = "North"
         robots[addr] = [ID,robotX,robotY,direction,"red"]
-        #Locatie: [1, 1]; Robot-ID: 21;
     else:
         m = re.search('direction: (.+?)', data)
         if m:
@@ -325,19 +321,12 @@ if __name__== '__main__':
     global quit
     global client_sock, client_info
     quit = False
+    
     thread = Thread(target = listenBluetooth)
     thread.start()
     threads.append(thread)
     
     guiMain()
-
-    #thread1 = Thread(target = guiMain)
-    #thread1.start()
-    #threads.append(thread1)
-    
-
     
     for thread in threads:
         thread.join()
-
-    #client_sock.close()
