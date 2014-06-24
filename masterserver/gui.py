@@ -23,7 +23,6 @@ robotY = 0
 global ID
 ID = 0
 
-
 global OccupiedLocations
 OccupiedLocations = [[0 for x in xrange(5)] for x in xrange(5)] 
 for i in range(5):
@@ -32,9 +31,9 @@ for i in range(5):
         OccupiedLocations[i][4] = 1
         OccupiedLocations[i][0] = 1
         
+
 global robots
 robots = {}
-
 global direction
 direction = "None"
 global clients
@@ -302,8 +301,7 @@ def gui():
             dx = canvas_width/x
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
-    
-    
+
     drawRobot(dx,dy,dx/2,direction,robotX,robotY,canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
