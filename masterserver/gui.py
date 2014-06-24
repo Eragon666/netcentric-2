@@ -14,34 +14,29 @@ from random import randint
 canvas_width = 600
 canvas_height = 600
 
+global x
 x = 4
+global y
 y = 4
 
-global robotX
-robotX = 0
-global robotY
-robotY = 0
-global ID
-ID = 0
-
 global OccupiedLocations
-OccupiedLocations = [[0 for x in xrange(5)] for x in xrange(5)] 
-for i in range(5):
-        OccupiedLocations[4][i] = 1
+OccupiedLocations = [[0 for i in xrange(x+1)] for i in xrange(x+1)] 
+for i in range(x+1):
+        OccupiedLocations[x][i] = 1
         OccupiedLocations[0][i] = 1
-        OccupiedLocations[i][4] = 1
+        OccupiedLocations[i][x] = 1
         OccupiedLocations[i][0] = 1
 
 global robot_list
 robot_list = []
-for i in range(1,10):
+
+for i in range(1,x*y+1):
         robot_list.append([i, '', ''])
         
 
 global robots
 robots = {}
-global direction
-direction = "None"
+
 global clients
 clients = []
 
@@ -155,7 +150,7 @@ def listenBluetooth():
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
                 print("Accepted connection from ", addr)
-                robots[addr] = [ID,robotX,robotY,direction,"red"]
+                #robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
 
                 random_val = randint(0,8)
@@ -212,39 +207,6 @@ def listenBluetooth():
                         
                                         s.close()
                                         read.remove(s)
-        
-        #print quit
-        """
-        if (quit):
-            for client in clients:
-                client[0].close()
-            break
-        elif (listen):
-            try:
-                for client in clients:
-                    data = client[0].recv(1024)
-                    if len(data) == 0:
-                        pass
-                    else:
-                        if "QRdata: " in data:
-                            QRdata = data.replace("QRdata: ", "")
-                            currentLocation = QRdata.replace("Locatie: ", "").replace("; Robot-ID: 21;", "")
-                            client[0].send("currentLocation: " + currentLocation)
-                        elif "direction: " in data:
-                            direction = data.replace("direction: ", "")
-                            confirmation = Confirm(currentLocation, direction)
-                            if confirmation =="True":
-                                client[0].send("confirmation: " + confirmation)
-                            else:
-                                client[0].send("currentLocation: " + currentLocation)
-                        print data
-                        parser(data)
-                        gui()
-                        print("received [%s]" % data)
-                
-            except IOError:
-                pass
-                """
 
 def guiMain():
     global root
@@ -273,6 +235,7 @@ def connect():
 
 def drawQR(x,y,size,canvas):
     global root
+
     dsize = size/4
     nextx = x
     nexty = y
@@ -306,18 +269,14 @@ def drawRobot(x,y,size,direction,xco,yco,canvas):
         figure = canvas.create_polygon(xleft, yup, xright, yup, xleft+size/4, ydown, fill="red")
     elif (direction == "West"):
         figure = canvas.create_polygon(xleft, ydown-size/4, xright, ydown, xright, yup, fill="red")
-    #figure=canvas.create_rectangle(x+size/2,canvas_height-y -size/4,x+size,canvas_height-y-size+size/4, fill="yellow")
-
-#def parser(self, data):
-    #for s in data:
-        #if s
-     
-    #self.canvas.update_idletasks()
-    #drawRobot(self,20,20,300,1,1,1)
 
 def gui():
     global root
     global direction
+    global x
+    global y
+    global OccupiedLocations
+
     entry = tk.Entry(root)
     stvar=tk.StringVar()
     stvar.set("one")
@@ -325,8 +284,10 @@ def gui():
     canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
     canvas.grid(row=0,column=1,ipadx=10,ipady=10)
 
-    #frame = Frame(self.root)
-    #frame.grid(row=0,column=0, sticky="n")
+    if not OccupiedLocations[x][y]:
+            #OccupiedLocations[x][y][1] = [False, 1, 0]
+            print("Added shit to grid")
+
     label1=Label(root, text="Grid size")
     label1.grid(row=0,column=0, sticky="nw")
     label2=Label(root, text="X").grid(row=1,column=0, sticky="w")
@@ -334,7 +295,6 @@ def gui():
     e = Entry(root)
     e.grid(row = 1,column = 1,sticky = E+ W)
     text = e.get()
-    print text
     Button1=Button(root,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
 
     for i in range(x):
@@ -343,13 +303,8 @@ def gui():
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
 
-    for keys,values in robots.items():
-        print(keys)
-        print(values)
     for key, value in robots.items():
         drawRobot(dx,dy,dx/2,value[3],value[1],value[2],canvas)
-    #drawRobot(dx,dy,300,1,0,0,canvas)
-    #root.mainloop()
 
 def handler(self):
     global quit
@@ -357,49 +312,44 @@ def handler(self):
         #client_sock.close()
         #server_sock.close()
         exitGui()
-        print "1"
         quit = True
-        print "2"
         print("vamos a la playa")
         self.root.quit()
-        print "3"
         
 def parser(data, addr):
-    global robotX, robotY, ID
     extract = re.findall(r'\d+',data)
     if extract:
-        print "poep"
         print extract
-        print "poep2"
         robotX = int(extract[0])
         robotY = int(extract[1])
         ID = int(extract[2])
-        direction = "East"
+        direction = "North"
         robots[addr] = [ID,robotX,robotY,direction,"red"]
-        #Locatie: [1, 1]; Robot-ID: 21;
     else:
         m = re.search('direction: (.+?)', data)
         if m:
             found = m.group(1)
-            robots[addr][3] = found
+            if found == "N":
+                robots[addr][3] = "North"
+            elif found == "W":
+                robots[addr][3] = "West"
+            elif found == "E":
+                robots[addr][3] = "East"
+            elif found == "S":
+                robots[addr][3] = "South"
+            else:
+                robots[addr][3] = "None"
         
 if __name__== '__main__':
     global quit
     global client_sock, client_info
     quit = False
+    
     thread = Thread(target = listenBluetooth)
     thread.start()
     threads.append(thread)
     
     guiMain()
-
-    #thread1 = Thread(target = guiMain)
-    #thread1.start()
-    #threads.append(thread1)
-    
-
     
     for thread in threads:
         thread.join()
-
-    #client_sock.close()
