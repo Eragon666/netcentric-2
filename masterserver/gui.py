@@ -35,7 +35,7 @@ for i in range(5):
 global robot_list
 robot_list = []
 for i in range(1,10):
-        robot_list.append([i, ''])
+        robot_list.append([i, '', ''])
         
 
 global robots
@@ -158,14 +158,29 @@ def listenBluetooth():
                 robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
 
-                robot_list[randint(1,10)][1] = addr
+                random_val = randint(0,8)
+                while robot_list[random_val][1] != '':
+                        random_val = randint(0,8)
+                        
+                robot_list[random_val][1] = addr[0]
+                robot_list[random_val][2] = conn
+                print "robotid: ", robot_list[random_val][0]
+                print robot_list
             else:
                 data = s.recv(1024)
                 if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
                         currentLocation = QRdata[9:15]
-                        robot_id = QRdata[27:29]
+                        robot_id = QRdata[27:28]
+
+                        for mac in robot_list:
+                                if mac[0] == int(robot_id):
+                                        for write in writable:
+                                                if write == mac[2]:
+                                                        print "Sent message to ", write
+                                                        write.send("finalDestination: " + currentLocation)
+                                        
                         
                         s.send("currentLocation: " + currentLocation)
                     elif "direction: " in data:
@@ -176,6 +191,7 @@ def listenBluetooth():
                             print "connection", addr, "closed"
                             s.close()
                             read.remove(s)
+                            break
                             
                         confirmation = Confirm(currentLocation, direction)
                         if confirmation =="True":
@@ -187,9 +203,15 @@ def listenBluetooth():
                     gui()
                     print("received [%s]" % data)
                 else:
-                    print "connection", addr, "closed"
-                    s.close()
-                    read.remove(s)
+                    for mac in robot_list:
+                                if mac[2] == s:
+                                        print "connection", mac[1], "closed"
+                                        
+                                        mac[1] = ''
+                                        mac[2] = ''
+                        
+                                        s.close()
+                                        read.remove(s)
         
         #print quit
         """

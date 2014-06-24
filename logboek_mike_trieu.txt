@@ -71,4 +71,4 @@ Netcentric Computing - Labreport Week 2-4
 - Meerdere slaves mogelijk gemaakt in de master app [met patrick, floris]
 
 24/6/2014
-- 
+- Robot_id stuff gemaakt, final destination dingen. Mac adress problemen
