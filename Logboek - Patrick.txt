@@ -58,7 +58,7 @@ dopen naar MasterApp om een hogere stabiliteit te bereiken.
 
 23-06-2014
 Vandaag hebben we onderzocht hoe het probleem dat we slechts een robot tegelijk
-kunnen verbinden met de MasterApp kunnen oplossen. Twee oplossingen:
+kunnen verbinden met de MasterApp kunnen oplossen. Drie oplossingen:
    1. De MasterApp op de laptop uitbreiden zodat er twee mobiele apparaten via
       Bluetooth verbonden kunnen worden.
    2. Terug naar het framework en nog een mobiel apparaat tussen de MasterApp
@@ -88,3 +88,10 @@ dit niet lukken, dan moeten we het juiste moment van vrijgeven gaan zoeken.
 Mogelijk kan dit op het moment dat de QR-code op de volgende locatie gescand
 is. Het nadeel van deze methode is dat de oude locatie langer dan daadwerkelijk
 nodig is bezet wordt gehouden.
+
+Ook hebben we vandaag het einde geimplementeerd, dit bestaat uit het sturen van
+de finalDestination naar de bijbehorende Robot/MBED. De ontvangst van een
+finalDestination-message door de SlaveApp was al geimplementeerd.
+Ook moest ervoor gezorgd worden dat bij een Disconnect de waardes in de array
+OccupiedLocations worden gewijzigd. Als dit niet gebeurt, dan blijft een
+locatie onbereikbaar ondanks dat de Robot/MBED als uit de grid is gehaald.
