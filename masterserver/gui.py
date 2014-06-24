@@ -82,6 +82,7 @@ advertise_service( server_sock, "SampleServer",
 def listenBluetooth():
     global robots
     currentLocation = "[1, 1]"
+    robot_id = ""
     global direction
     global OccupiedLocations
     confirmation = "False"
@@ -163,10 +164,19 @@ def listenBluetooth():
                 if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
-                        currentLocation = QRdata.replace("Locatie: ", "").replace("; Robot-ID: 21;", "")
+                        currentLocation = QRdata[9:15]
+                        robot_id = QRdata[27:29]
+                        
                         s.send("currentLocation: " + currentLocation)
                     elif "direction: " in data:
                         direction = data.replace("direction: ", "")
+
+                        #Close connection when robot is on final location
+                        if direction == "Done":
+                            print "connection", addr, "closed"
+                            s.close()
+                            read.remove(s)
+                            
                         confirmation = Confirm(currentLocation, direction)
                         if confirmation =="True":
                             s.send("confirmation: " + confirmation)
