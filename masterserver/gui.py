@@ -76,6 +76,8 @@ advertise_service( server_sock, "SampleServer",
 
 def listenBluetooth():
     global robots
+    global x
+    global y
     currentLocation = "[1, 1]"
     robot_id = ""
     global direction
@@ -153,9 +155,9 @@ def listenBluetooth():
                 #robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
 
-                random_val = randint(0,8)
+                random_val = randint(0,x*y-1)
                 while robot_list[random_val][1] != '':
-                        random_val = randint(0,8)
+                        random_val = randint(0,x*y-1)
                         
                 robot_list[random_val][1] = addr[0]
                 robot_list[random_val][2] = conn
