@@ -74,6 +74,7 @@ advertise_service( server_sock, "SampleServer",
 
 
 def listenBluetooth():
+    global robots
     currentLocation = "[1, 1]"
     global direction
     global OccupiedLocations
@@ -302,7 +303,8 @@ def gui():
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
 
-    drawRobot(dx,dy,dx/2,direction,robotX,robotY,canvas)
+    for key, value in robots.items():
+        drawRobot(dx,dy,dx/2,value[3],value[1],value[2],canvas)
     #drawRobot(dx,dy,300,1,0,0,canvas)
     #root.mainloop()
 
