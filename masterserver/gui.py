@@ -14,11 +14,13 @@ from random import randint
 canvas_width = 600
 canvas_height = 600
 
-x = 4
-y = 4
+global x
+x = 6
+global y
+y = 6
 
 global OccupiedLocations
-OccupiedLocations = [[0 for x in xrange(5)] for x in xrange(5)] 
+OccupiedLocations = [[0 for i in xrange(5)] for i in xrange(5)] 
 for i in range(5):
         OccupiedLocations[4][i] = 1
         OccupiedLocations[0][i] = 1
@@ -27,7 +29,7 @@ for i in range(5):
 
 global robot_list
 robot_list = []
-for i in range(1,10):
+for i in range(1,37):
         robot_list.append([i, ''])
         
 
@@ -243,6 +245,7 @@ def connect():
 
 def drawQR(x,y,size,canvas):
     global root
+
     dsize = size/4
     nextx = x
     nexty = y
@@ -288,6 +291,8 @@ def drawRobot(x,y,size,direction,xco,yco,canvas):
 def gui():
     global root
     global direction
+    global x
+    global y
     entry = tk.Entry(root)
     stvar=tk.StringVar()
     stvar.set("one")
@@ -309,6 +314,10 @@ def gui():
 
     for i in range(x):
         for j in range(y):
+            print "x:"
+            print x
+            print "y"
+            print y
             dx = canvas_width/x
             dy = canvas_height/y
             drawQR(dx*i,dy*j,dx/2, canvas)
