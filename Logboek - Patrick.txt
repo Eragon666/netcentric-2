@@ -88,3 +88,9 @@ dit niet lukken, dan moeten we het juiste moment van vrijgeven gaan zoeken.
 Mogelijk kan dit op het moment dat de QR-code op de volgende locatie gescand
 is. Het nadeel van deze methode is dat de oude locatie langer dan daadwerkelijk
 nodig is bezet wordt gehouden.
+
+Ook hebben we vandaag het einde geimplementeerd, dit bestaat uit het sturen van
+de finalDestination naar de bijbehorende Robot/MBED. Ook moest ervoor gezorgd
+worden dat bij een Disconnect de waardes in de array OccupiedLocations worden
+gewijzigd. Als dit niet gebeurt, dan blijft een locatie onbereikbaar ondanks
+dat de Robot/MBED als uit de grid is gehaald.
