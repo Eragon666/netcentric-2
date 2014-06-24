@@ -9,6 +9,7 @@ import random
 from time import *
 import re
 import select
+from random import randint
 
 canvas_width = 600
 canvas_height = 600
@@ -30,6 +31,11 @@ for i in range(5):
         OccupiedLocations[0][i] = 1
         OccupiedLocations[i][4] = 1
         OccupiedLocations[i][0] = 1
+
+global robot_list
+robot_list = []
+for i in range(1,10):
+        robot_list.append([i, ''])
         
 
 global robots
@@ -151,6 +157,8 @@ def listenBluetooth():
                 print("Accepted connection from ", addr)
                 robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
+
+                robot_list[randint(1,10)][1] = addr
             else:
                 data = s.recv(1024)
                 if data:
