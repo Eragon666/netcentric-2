@@ -17,10 +17,6 @@ canvas_height = 600
 x = 4
 y = 4
 
-global robotX
-robotX = 0
-global robotY
-robotY = 0
 global ID
 ID = 0
 
@@ -155,7 +151,7 @@ def listenBluetooth():
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
                 print("Accepted connection from ", addr)
-                robots[addr] = [ID,robotX,robotY,direction,"red"]
+                #robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
 
                 robot_list[randint(1,10)][1] = addr
@@ -343,7 +339,6 @@ def handler(self):
         print "3"
         
 def parser(data, addr):
-    global robotX, robotY, ID
     extract = re.findall(r'\d+',data)
     if extract:
         print "poep"
