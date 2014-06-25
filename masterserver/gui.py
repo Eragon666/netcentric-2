@@ -21,12 +21,12 @@ y = 4
 
 global OccupiedLocations
 OccupiedLocations = [[0 for i in xrange(y+2)] for j in xrange(x+2)] 
-for i in range(x+1):
-    OccupiedLocations[i][y] = 1
+for i in range(x+2):
+    OccupiedLocations[i][y+1] = 1
     OccupiedLocations[i][0] = 1
 
-for i in range(y+1):
-    OccupiedLocations[x][i] = 1
+for i in range(y+2):
+    OccupiedLocations[x+1][i] = 1
     OccupiedLocations[0][i] = 1
 
 global robot_list
@@ -92,7 +92,7 @@ def listenBluetooth():
     global OccupiedLocations
     confirmation = "False"
 
-    ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
+    # ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
     
     
     
@@ -100,7 +100,7 @@ def listenBluetooth():
         # Also needs a global array with all the reserved locations.
         # Currently named: 'ReservedLocations' */
         # Initialize 'newPosition' based on parameters.
-        newPostion = ""
+        # newPostion = ""
         newX = 0
         newY = 0
         test = currentLocation.replace("Locatie: ", "")
@@ -127,14 +127,16 @@ def listenBluetooth():
             print "locations array"
             return "False"
               
-        newPosition = "[" + str(newX) + ", " + str(newY) + "]"
-        if newPosition in ReservedLocations:
-            print "locations string"
-            return "False"
+        # newPosition = "[" + str(newX) + ", " + str(newY) + "]"
+        # if newPosition in ReservedLocations:
+            # print "locations string"
+            # return "False"
         
         
         OccupiedLocations[newX][newY] = 1
         OccupiedLocations[currentX][currentY] = 0
+        for i in range(6):
+            print OccupiedLocations[:][i]
             
         return "True"
     
@@ -172,7 +174,7 @@ def listenBluetooth():
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
                         currentLocation = QRdata[9:15]
-                        robot_id = QRdata[27:28]
+                        robot_id = QRdata[27:29]
 
                         for mac in robot_list:
                                 if mac[0] == int(robot_id):
