@@ -19,6 +19,8 @@ x = 4
 global y
 y = 4
 
+colorList = ["red", "yellow", "blue", "green", "orange", "pink", "black", "purple", "brown"]
+
 global OccupiedLocations
 OccupiedLocations = [[0 for i in xrange(y+2)] for j in xrange(x+2)] 
 for i in range(x+2):
@@ -249,7 +251,7 @@ def drawQR(canvas):
             if (blocks[(i,j)][0]):
                 figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill="white")
         
-def drawRobot(direction,xco,yco,canvas):
+def drawRobot(direction,xco,yco,canvas, color):
     xco -= 1
     yco -= 1
     dx = canvas_width/x 
@@ -262,15 +264,17 @@ def drawRobot(direction,xco,yco,canvas):
     xright = xplace+size
     ydown = canvas_height-yplace-size/4
     yup = canvas_height-yplace-size+size/4
+    
+    #color = len(read) - 2
 
     if (direction == "North"):
-        figure = canvas.create_polygon(xleft, ydown, xright, ydown, xleft+size/4, yup, fill="red")
+        figure = canvas.create_polygon(xleft, ydown, xright, ydown, xleft+size/4, yup, fill=color)
     elif (direction == "East"):
-        figure = canvas.create_polygon(xleft, ydown, xleft, yup, xright, ydown-size/4, fill="red")
+        figure = canvas.create_polygon(xleft, ydown, xleft, yup, xright, ydown-size/4, fill=color)
     elif (direction == "South"):
-        figure = canvas.create_polygon(xleft, yup, xright, yup, xleft+size/4, ydown, fill="red")
+        figure = canvas.create_polygon(xleft, yup, xright, yup, xleft+size/4, ydown, fill=color)
     elif (direction == "West"):
-        figure = canvas.create_polygon(xleft, ydown-size/4, xright, ydown, xright, yup, fill="red")
+        figure = canvas.create_polygon(xleft, ydown-size/4, xright, ydown, xright, yup, fill=color)
 
 def gui():
     global root
@@ -299,7 +303,7 @@ def gui():
     drawQR(canvas)
 
     for key, value in robots.items():
-        drawRobot(value[3],value[1],value[2],canvas)
+        drawRobot(value[3],value[1],value[2],canvas, value[4])
 
 def handler(self):
     global quit
@@ -319,7 +323,8 @@ def parser(data, addr):
         robotY = int(extract[1])
         ID = int(extract[2])
         direction = "North"
-        robots[addr] = [ID,robotX,robotY,direction,"red"]
+        color = len(read) - 2
+        robots[addr] = [ID,robotX,robotY,direction,colorList[color]]
         blocks[(robotX-1, robotY-1)] = [True, addr]
     else:
         m = re.search('direction: (.+?)', data)
