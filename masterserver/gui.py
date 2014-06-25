@@ -90,36 +90,28 @@ def listenBluetooth():
     robot_id = ""
     global direction
     global OccupiedLocations
-    confirmation = "False"
-
-    # ReservedLocations = ["[0, 1]", "[0, 2]", "[0, 3]", "[4, 1]", "[4, 2]", "[4, 3]", "[1, 0]", "[2, 0]", "[3, 0]", "[1, 4]", "[2, 4]", "[3, 4]"]
-    
+    confirmation = "False"    
     
     
     def Confirm(currentLocation, direction):
         # Also needs a global array with all the reserved locations.
         # Currently named: 'ReservedLocations' */
         # Initialize 'newPosition' based on parameters.
-        # newPostion = ""
         newX = 0
         newY = 0
         test = currentLocation.replace("Locatie: ", "")
         currentX = int(test[1])
         currentY = int(test[4])
         if direction == "North":
-            #newPosition = "[" + str(currentX) + ", " + str(currentY + 1) + "]"
             newX = currentX
             newY = currentY + 1
         elif direction == "East":
-            #newPosition = "[" + str(currentX + 1) + ", " + str(currentY) + "]"
             newX = currentX + 1
             newY = currentY
         elif direction == "South":
-            #newPosition = "[" + str(currentX) + ", " + str(currentY - 1) + "]"
             newX = currentX
             newY = currentY - 1
         elif direction == "West":
-            #newPosition = "[" + str(currentX - 1) + ", " + str(currentY) + "]"
             newX = currentX - 1
             newY = currentY
           
@@ -127,11 +119,6 @@ def listenBluetooth():
             print "locations array"
             return "False"
               
-        # newPosition = "[" + str(newX) + ", " + str(newY) + "]"
-        # if newPosition in ReservedLocations:
-            # print "locations string"
-            # return "False"
-        
         
         OccupiedLocations[newX][newY] = 1
         OccupiedLocations[currentX][currentY] = 0
@@ -299,9 +286,6 @@ def gui():
     canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
     canvas.grid(row=0,column=1,ipadx=10,ipady=10)
 
-    if not OccupiedLocations[x][y]:
-            #OccupiedLocations[x][y][1] = [False, 1, 0]
-            print("Added shit to grid")
 
     label1=Label(root, text="Grid size")
     label1.grid(row=0,column=0, sticky="nw")
