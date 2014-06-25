@@ -20,12 +20,14 @@ global y
 y = 4
 
 global OccupiedLocations
-OccupiedLocations = [[0 for i in xrange(x+1)] for i in xrange(x+1)] 
+OccupiedLocations = [[0 for i in xrange(y+1)] for j in xrange(x+1)] 
 for i in range(x+1):
-        OccupiedLocations[x][i] = 1
-        OccupiedLocations[0][i] = 1
-        OccupiedLocations[i][x] = 1
-        OccupiedLocations[i][0] = 1
+    OccupiedLocations[i][y] = 1
+    OccupiedLocations[i][0] = 1
+
+for i in range(y+1):
+    OccupiedLocations[x][i] = 1
+    OccupiedLocations[0][i] = 1
 
 global robot_list
 robot_list = []
