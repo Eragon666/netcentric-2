@@ -148,6 +148,7 @@ public class MainActivity extends ServiceActivity {
         /***
          * Code for QR scanner
          * Source: ZBarAndroidSDK-0.2 example
+         *         http://sourceforge.net/projects/zbar/
          **/
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
@@ -565,6 +566,7 @@ public class MainActivity extends ServiceActivity {
     /***
      * Functions for QR scanner
      * Source: ZBarAndroidSDK-0.2 example
+     *         http://sourceforge.net/projects/zbar/
      *
      * Copied:
      *   getCamerainstance()
