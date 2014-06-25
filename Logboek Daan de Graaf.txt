@@ -50,3 +50,13 @@ Robot kan naar een direction draaien, Robot print nu goed voor elke grid. Robot 
 Foto's gemaakt van de opstelling en begonnen aan de poster.
 
 Dinsdag 24-6:
+
+Er kunnen twee robots over de grid lopen met een andere kleur per robot. Pas als een qrcode ontdekt is wordt deze geprint.
+
+
+Woensdag 25-6:
+
+Poster wordt gemaakt
+
+
+
