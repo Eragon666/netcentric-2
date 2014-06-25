@@ -149,7 +149,7 @@ def listenBluetooth():
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
                 read.append(conn)
-                robots[addr] = [0,0,0,0,colorList[len(read) - 2]]
+                robots[conn] = [0,0,0,0,colorList[len(read) - 2]]
 
                 random_val = randint(0,x*y-1)
                 while robot_list[random_val][1] != '':
@@ -160,6 +160,7 @@ def listenBluetooth():
                 print("Accepted connection from ", addr, "with robotid: ", robot_list[random_val][0])
             else:
                 data = s.recv(1024)
+                print "s ", s
                 if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
@@ -191,7 +192,13 @@ def listenBluetooth():
                         else:
                             s.send("currentLocation: " + currentLocation)
                     print data
-                    parser(data, addr)
+                    # print writable
+                    # for mac in robot_list:
+                        # for write in writable:
+                            # print write
+                            # if write == mac[2]:
+                    parser(data, s)
+                    print robots
                     gui()
                     print("received [%s]" % data)
                 else:
@@ -265,8 +272,6 @@ def drawRobot(direction,xco,yco,canvas, color):
     xright = xplace+size
     ydown = canvas_height-yplace-size/4
     yup = canvas_height-yplace-size+size/4
-    
-    #color = len(read) - 2
 
     if (direction == "North"):
         figure = canvas.create_polygon(xleft, ydown, xright, ydown, xleft+size/4, yup, fill=color)
@@ -316,7 +321,7 @@ def handler(self):
         print("vamos a la playa")
         self.root.quit()
         
-def parser(data, addr):
+def parser(data, conn):
     extract = re.findall(r'\d+',data)
     if extract:
         print extract
@@ -325,22 +330,25 @@ def parser(data, addr):
         ID = int(extract[2])
         direction = "North"
         
-        robots[addr][:4] = [ID,robotX,robotY,direction]
-        blocks[(robotX-1, robotY-1)] = [True, addr]
+        robots[conn][0] = ID
+        robots[conn][1] = robotX
+        robots[conn][2] = robotY
+        robots[conn][3] = direction
+        blocks[(robotX-1, robotY-1)] = [True, conn]
     else:
         m = re.search('direction: (.+?)', data)
         if m:
             found = m.group(1)
             if found == "N":
-                robots[addr][3] = "North"
+                robots[conn][3] = "North"
             elif found == "W":
-                robots[addr][3] = "West"
+                robots[conn][3] = "West"
             elif found == "E":
-                robots[addr][3] = "East"
+                robots[conn][3] = "East"
             elif found == "S":
-                robots[addr][3] = "South"
+                robots[conn][3] = "South"
             else:
-                robots[addr][3] = "None"
+                robots[conn][3] = "None"
         
 if __name__== '__main__':
     global quit
