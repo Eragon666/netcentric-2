@@ -100,6 +100,7 @@ public class MainActivity extends ServiceActivity {
 
     private boolean barcodeScanned = false;
     private boolean previewing = true;
+    private boolean connected = false;
 
     // Load QR scanner library
     static {
@@ -390,6 +391,7 @@ public class MainActivity extends ServiceActivity {
                     try {
                         connection.cancel();
                         Log.i("Masterserver", "Disconnected");
+                        connected = false;
                     } catch(IOException e) {
                         Log.e("Masterserver", "Error" + e);
                     }
@@ -427,15 +429,17 @@ public class MainActivity extends ServiceActivity {
             MainActivity.this.runOnUiThread(new Runnable() {
                 public void run() {
                     Log.i("Masterserver", "Connected bluetooth");
+                    connected = true;
                     //MainActivity.this.onConnected(true);
                 }
             });
         }
 
         public void onDisconnected() {
-            Log.i("Masterserver", "disconnected bluetooth");
+            Log.i("Masterserver", "Disconnected bluetooth 12");
             MainActivity.this.runOnUiThread(new Runnable() {
                 public void run() {
+                    Log.i("Masterserver", "Disconnected bluetooth");
                     //MainActivity.this.onConnected(false);
                 }
             });
@@ -626,7 +630,7 @@ public class MainActivity extends ServiceActivity {
 
             int result = scanner.scanImage(barcode);
 
-            if (result != 0) {
+            if (result != 0 && connected) {
                 previewing = false;
                 mCamera.setPreviewCallback(null);
                 mCamera.stopPreview();
@@ -634,15 +638,13 @@ public class MainActivity extends ServiceActivity {
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
                     String QRdata = sym.getData();
-
                     Log.i("message", QRdata);
-
                     scanText.setText("QR-Code: " + QRdata);
-
                     SendMessage("QRdata: " + QRdata);
-
                     barcodeScanned = true;
                 }
+            } else if(result != 0 && !connected) {
+                Log.i("Bluetooth", "Scanned while not connected!");
             }
         }
     };
