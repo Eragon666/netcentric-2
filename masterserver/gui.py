@@ -130,6 +130,7 @@ def listenBluetooth():
         return "True"
     
     global root
+    global colorList
     print("Waiting for connection on RFCOMM channel %d" %port)
     global quit
     global client_sock, client_info
@@ -148,7 +149,7 @@ def listenBluetooth():
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
                 read.append(conn)
-                robots[addr][4] = colorList[len(read) - 2]
+                robots[addr] = [0,0,0,0,colorList[len(read) - 2]]
 
                 random_val = randint(0,x*y-1)
                 while robot_list[random_val][1] != '':
@@ -324,7 +325,7 @@ def parser(data, addr):
         ID = int(extract[2])
         direction = "North"
         
-        robots[addr][:3] = [ID,robotX,robotY,direction]
+        robots[addr][:4] = [ID,robotX,robotY,direction]
         blocks[(robotX-1, robotY-1)] = [True, addr]
     else:
         m = re.search('direction: (.+?)', data)
