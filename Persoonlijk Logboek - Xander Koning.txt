@@ -34,3 +34,46 @@ Vandaag hebben we niet zoveel kunnen doen, aangezien Daan later was en uiteindel
 alweer weg, Floris, Patrick en Mike konden niet zoveel doen, want de kast met apparatuur was op slot. Wel hebben we het voor elkaar 
 gekregen dat er data van de telefoon, in een byte array, gestuurd kan worden naar de laptop, dus dat is wel mooi.
 Nu moeten we alleen nog het tegenovergestelde voor elkaar krijgen.
+
+ma 16-6:
+
+Vandaag heb ik met Matthijs proberen voor elkaar te krijgen dat de python server ook berichten naar de android client kan
+sturen. Veel verschillende manieren geprobeerd, maar het is vandaag nog niet gelukt.
+
+di 17-6:
+
+Vanochtend had Matthijs het versturen van berichten al snel werkend. Daarna hebben we gezamenlijk besloten dat het beter was om het luisteren 
+van de server en het verversen van de GUI in aparte threads te zetten, omdat ze beide constant moeten worden uitgevoerd.
+Dat heb ik gedaan en het werkte.
+
+wo 18-6:
+
+Het mogelijk maken dat de GUI kan worden afgesloten voor elkaar krijgen bleek nog best lastig.
+Hier ben ik de hele dag mee bezig geweest, maar ook nu geldt: het is nog niet gelukt. Geen ramp.
+
+do 19-6:
+
+Dankzij onze voortgang vandaag is het mogelijk om wat zinnigs naar de app terug te sturen en wat zinnigs te doen met de 
+scans van de app. De locatie wordt verstuurd en deze wordt doorgegeven. Alleen wordt de robot nog niet live op die locatie
+geprint in de GUI.
+
+vr 20-6:
+
+GUI wordt live ververst. Alleen waren de locaties nog niet overeenkomstig met hoe de heren die zich met de robot bezig houden
+het voor ogen hadden... Dit hebben we dus moeten omzetten, maar de positie waar de robot geprint wordt was hierdoor niet meer
+precies midden in een vakje.
+
+ma 23-6:
+
+Nu is het mogelijk dat de robots op de juiste plek worden afgebeeld in de GUI. Dit heb ik samen met Daan bewerkstelligd. Eerst in de vorm van een rechthoek, maar nu 
+als driehoek. Dit heeft het voordeel dat je de robot zijn richting kan afbeelden op de GUI. Ook kunnen er nu meerdere telefoons met de laptop verbinden, waardoor het
+nodig was om meerdere robots tegelijk af te beelden. Daarom heb ik een dictionary gemaakt die de robots bevat met als key het MAC adres van de telefoon en
+als value een lijst met de benodigde informatie.
+
+di 24-6:
+
+Het was nog een probleem hoe de GUI ververst werd, dat was namelijk gewoon een GUI die een grid printte met de robot erop.
+Maar de GUI moet pas vakjes printen als ze gescand zijn. Dat hebben we vandaag in orde gemaakt. Ook kan je nu bijhouden per vakje of het een eindpunt is of niet.
+
+wo 25-6:
+
