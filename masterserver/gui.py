@@ -147,8 +147,8 @@ def listenBluetooth():
             if s == server_sock:
                 conn, addr = server_sock.accept()
                 s.setblocking(0)
-                #robots[addr] = [ID,robotX,robotY,direction,"red"]
                 read.append(conn)
+                robots[addr][4] = colorList[len(read) - 2]
 
                 random_val = randint(0,x*y-1)
                 while robot_list[random_val][1] != '':
@@ -323,8 +323,8 @@ def parser(data, addr):
         robotY = int(extract[1])
         ID = int(extract[2])
         direction = "North"
-        color = len(read) - 2
-        robots[addr] = [ID,robotX,robotY,direction,colorList[color]]
+        
+        robots[addr][:3] = [ID,robotX,robotY,direction]
         blocks[(robotX-1, robotY-1)] = [True, addr]
     else:
         m = re.search('direction: (.+?)', data)
