@@ -1,3 +1,7 @@
+/***
+ * Heavily modified code from the provided framework (UvA Netcentric 2013/2014 course)
+ */
+
 package uva.nc.app;
 
 import android.bluetooth.BluetoothAdapter;
@@ -56,7 +60,7 @@ public class MainActivity extends ServiceActivity {
     // BT Controls.
     private TextView listenerStatusText;
     private TextView ownAddressText;
-    private Button listenerButton;
+    private Button connectButton;
     private Button disconnectButton;
 
     // mBed Controls.
@@ -200,7 +204,7 @@ public class MainActivity extends ServiceActivity {
         // Bluetooth controls.
         ownAddressText = (TextView)findViewById(R.id.own_address);
         listenerStatusText = (TextView)findViewById(R.id.listener_status);
-        listenerButton = (Button)findViewById(R.id.listener);
+        connectButton = (Button)findViewById(R.id.listener);
         disconnectButton = (Button)findViewById(R.id.disconnect);
 
         // Mbed controls
@@ -351,9 +355,9 @@ public class MainActivity extends ServiceActivity {
     }
 
 
+    // Controls to connect and disconnect to Bluetooth server
     private void refreshBluetoothControls() {
         String slaveStatus = "Status not available";
-        String slaveButton = "Start listening";
         String ownAddress = "Not available";
         boolean slaveButtonEnabled = false;
 
@@ -361,12 +365,10 @@ public class MainActivity extends ServiceActivity {
         final BluetoothService bluetooth = getBluetooth();
         if (bluetooth != null) {
             slaveButtonEnabled = true;
-
+            slaveStatus = "Master connecting";
             ownAddress = bluetooth.utility.getOwnAddress();
 
-            slaveStatus = "Master connecting";
-            slaveButton = "Connect to master";
-            listenerButton.setOnClickListener(new View.OnClickListener() {
+            connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
@@ -395,8 +397,7 @@ public class MainActivity extends ServiceActivity {
         }
 
         listenerStatusText.setText(slaveStatus);
-        listenerButton.setText(slaveButton);
-        listenerButton.setEnabled(slaveButtonEnabled);
+        connectButton.setEnabled(slaveButtonEnabled);
         disconnectButton.setEnabled(slaveButtonEnabled);
         ownAddressText.setText(ownAddress);
     }
@@ -412,7 +413,7 @@ public class MainActivity extends ServiceActivity {
         mbedConnectedText.setText(connText);
     }
 
-
+    // Function receives message from Bluetooth server
     private BluetoothThread.Listener bluetoothListener = new BluetoothThread.Listener() {
         String currentLocation = "[0, 0]";
         String finalDestination = "[0, 0]";
@@ -431,7 +432,7 @@ public class MainActivity extends ServiceActivity {
         }
 
         public void onDisconnected() {
-            Log.i("Masterserver", "disConnected bluetooth");
+            Log.i("Masterserver", "disconnected bluetooth");
             MainActivity.this.runOnUiThread(new Runnable() {
                 public void run() {
                     //MainActivity.this.onConnected(false);
@@ -444,19 +445,23 @@ public class MainActivity extends ServiceActivity {
 
         public void onReceived(byte[] buffer, int length) {
             Log.i("Masterserver", "received message with length" + length);
+
             final String Input = new String(buffer, 0, length);
+
             Log.i("Masterserver", "received message = " + Input);
 
+            // Hier wordt de finalDestination ontvangen.
             if (Input.contains("finalDestination: ")) {
-                        /* Hier wordt de finalDestination ontvangen. */
                 finalDestination = Input.replace("finalDestination: ", "");
                 roaming = false;
+
                 logComm.append("* Received Final Destination\n");
+            // Hier word de current location ontvangen
             } else if (Input.contains("currentLocation: ")) {
-                        /* Hier word de current location ontvangen*/
                 currentLocation = Input.replace("currentLocation: ", "");
 
                 Log.i("Masterserver", "currenLocation: " + currentLocation);
+
                 //scanText.setText("Current Location: " + currentLocation);
 
                 //TODO: niet meer locatie/ richting gebruiken die al afgekeurd is
@@ -469,8 +474,8 @@ public class MainActivity extends ServiceActivity {
                 }
 
                 SendMessage("direction: " + direction);
+            // Hier wordt de confirmation ontvangen.
             } else if (Input.contains("confirmation: ")) {
-                /* Hier wordt de confirmation ontvangen. */
                 confirmation = Input.replace("confirmation: ", "");
                 logComm.append("* Direction is free\n");
 
@@ -503,6 +508,7 @@ public class MainActivity extends ServiceActivity {
             Log.i("Masterserver", "Message: " + message);
         }
 
+        // Function for choosing a random direction to drive to
         public String RandomDirection() {
             int direction = 1 + (int)(Math.random() * ((4 - 1) + 1));
             if (direction == 1)
@@ -516,6 +522,7 @@ public class MainActivity extends ServiceActivity {
             return "None";
         }
 
+        // Function for finding the shortest path to the final destination of the omnibot
         public String KortstePadSolver(String currentLocation, String finalDestination) {
             /* currentLocation -> "[x, y]" */
             /* finalDestination -> "[x, y]" */
@@ -541,7 +548,7 @@ public class MainActivity extends ServiceActivity {
             }
         }
 
-        // Dit is de voorbeeldcode van Matthijs om een bericht te versturen.
+        // Sends message to Bluetooth server
         public void SendMessage(String Message) {
             byte[] b = Message.getBytes(Charset.forName("UTF-8"));
 
@@ -593,6 +600,8 @@ public class MainActivity extends ServiceActivity {
         }
     };
 
+    // QR scanner automatically sends message to Bluetooth server after scanning a QR code
+    // and pauses the scanner
     PreviewCallback previewCb = new PreviewCallback() {
         public void SendMessage(String Message) {
             byte[] b = Message.getBytes(Charset.forName("UTF-8"));
@@ -696,6 +705,7 @@ public class MainActivity extends ServiceActivity {
                         if (values == null || values.length != 1) {
                             toastShort("Error!");
                         } else {
+                            // Resumes QR scanner when omnibot finished driving
                             logComm.append("* Finished driving, activate QR scanner\n");
 
                             if((int)values[0] == 0) {
