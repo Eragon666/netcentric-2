@@ -111,8 +111,9 @@ public class MainActivity extends ServiceActivity {
     Button scanButton;
 
     // Initialize variables for bluetooth connection
+
     /****
-     * Device address Floris:   44:6D:75:96:64:F7
+     * Device address Floris:   44:6D:57:96:64:F7
      * Device address Matthijs: 00:15:83:15:A3:10
      * Device address Mike:     44:6D:57:4A:81:D4
      * Device address Patrick:  A4:17:31:ED:18:F8
@@ -120,7 +121,6 @@ public class MainActivity extends ServiceActivity {
      */
     private String deviceAddress = "44:6D:57:4A:81:D4";
     private UUID MY_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee");
-
     private BluetoothAdapter BA;
     private BluetoothThread connection;
 

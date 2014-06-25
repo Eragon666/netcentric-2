@@ -20,12 +20,14 @@ global y
 y = 4
 
 global OccupiedLocations
-OccupiedLocations = [[0 for i in xrange(x+1)] for i in xrange(x+1)] 
+OccupiedLocations = [[0 for i in xrange(y+2)] for j in xrange(x+2)] 
 for i in range(x+1):
-        OccupiedLocations[x][i] = 1
-        OccupiedLocations[0][i] = 1
-        OccupiedLocations[i][x] = 1
-        OccupiedLocations[i][0] = 1
+    OccupiedLocations[i][y] = 1
+    OccupiedLocations[i][0] = 1
+
+for i in range(y+1):
+    OccupiedLocations[x][i] = 1
+    OccupiedLocations[0][i] = 1
 
 global robot_list
 robot_list = []
@@ -36,6 +38,12 @@ for i in range(1,x*y+1):
 
 global robots
 robots = {}
+
+global blocks
+blocks = {}
+for i in range(x+1):
+    for j in range(y+1):
+        blocks[(i,j)] = [False, "None"]
 
 global clients
 clients = []
@@ -230,13 +238,9 @@ def connect():
     clients[-1][0].setblocking(0)
     listen = 1;     
 
-def drawQR(x,y,size,canvas):
-    global root
+def drawQR(canvas):
 
-    dsize = size/4
-    nextx = x
-    nexty = y
-    for i in range(4):
+    '''for i in range(4):
         nextx = nextx+dsize
         for j in range(4):
             if(random.randint(0,1)==1):
@@ -246,17 +250,29 @@ def drawQR(x,y,size,canvas):
             nexty = nexty+dsize
             figure=canvas.create_rectangle(nextx,canvas_height-nexty,nextx+dsize,canvas_height-nexty+dsize, fill=color)
         nexty = y
-
-def drawRobot(x,y,size,direction,xco,yco,canvas):
+''' 
+    dx = canvas_width/x
+    dy = canvas_height/y
+    size = dx/2
+    
+    for i in range(x):
+        for j in range(y):
+            if (blocks[(i,j)][0]):
+                figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill="white")
+        
+def drawRobot(direction,xco,yco,canvas):
     xco -= 1
     yco -= 1
-    x *= xco
-    y *= yco
+    dx = canvas_width/x 
+    dy = canvas_height/y 
+    size = dx/2
+    xplace = dx*xco
+    yplace = dy*yco
 
-    xleft = x+size/2
-    xright = x+size
-    ydown = canvas_height-y-size/4
-    yup = canvas_height-y-size+size/4
+    xleft = xplace+size/2
+    xright = xplace+size
+    ydown = canvas_height-yplace-size/4
+    yup = canvas_height-yplace-size+size/4
 
     if (direction == "North"):
         figure = canvas.create_polygon(xleft, ydown, xright, ydown, xleft+size/4, yup, fill="red")
@@ -294,14 +310,10 @@ def gui():
     text = e.get()
     Button1=Button(root,text="Connect",command=connect).grid(row = 3,column = 1, sticky = "we")
 
-    for i in range(x):
-        for j in range(y):
-            dx = canvas_width/x
-            dy = canvas_height/y
-            drawQR(dx*i,dy*j,dx/2, canvas)
+    drawQR(canvas)
 
     for key, value in robots.items():
-        drawRobot(dx,dy,dx/2,value[3],value[1],value[2],canvas)
+        drawRobot(value[3],value[1],value[2],canvas)
 
 def handler(self):
     global quit
@@ -322,6 +334,7 @@ def parser(data, addr):
         ID = int(extract[2])
         direction = "North"
         robots[addr] = [ID,robotX,robotY,direction,"red"]
+        blocks[(robotX-1, robotY-1)] = [True, addr]
     else:
         m = re.search('direction: (.+?)', data)
         if m:

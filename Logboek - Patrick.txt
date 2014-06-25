@@ -11,7 +11,7 @@ groepje.
 
 10-06-2014
 Plan van aanpak en een globale werkverdeling opgesteld.
- - Zie "Planning.txt", 
+ - Zie "Planning.txt"
 
 11-06-2014
 Plan van aanpak voor de Slave-App, waar ik zelf aan werk, gedetailleerder
