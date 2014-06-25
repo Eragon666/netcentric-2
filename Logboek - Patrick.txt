@@ -95,3 +95,6 @@ finalDestination-message door de SlaveApp was al geimplementeerd.
 Ook moest ervoor gezorgd worden dat bij een Disconnect de waardes in de array
 OccupiedLocations worden gewijzigd. Als dit niet gebeurt, dan blijft een
 locatie onbereikbaar ondanks dat de Robot/MBED als uit de grid is gehaald.
+
+25-06-2014
+Vandaag is de laatste hand gelegd aan het doolhof. De eindpositie werkt naar behoren, de randen worden ontweken evenals de andere robots. Het enige dat nu nog moet gebeuren is werk in de GUI, namelijk het geven van verschillende kleuren aan de Robots/MBEDs binnen het doolhof.
