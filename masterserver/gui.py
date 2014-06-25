@@ -20,7 +20,7 @@ global y
 y = 4
 
 global OccupiedLocations
-OccupiedLocations = [[0 for i in xrange(y+1)] for j in xrange(x+1)] 
+OccupiedLocations = [[0 for i in xrange(y+2)] for j in xrange(x+2)] 
 for i in range(x+1):
     OccupiedLocations[i][y] = 1
     OccupiedLocations[i][0] = 1
