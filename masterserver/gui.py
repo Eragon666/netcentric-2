@@ -245,6 +245,8 @@ def drawQR(canvas):
             figure=canvas.create_rectangle(nextx,canvas_height-nexty,nextx+dsize,canvas_height-nexty+dsize, fill=color)
         nexty = y
 ''' 
+    found = False
+    
     dx = canvas_width/x
     dy = canvas_height/y
     size = dx/2
@@ -252,7 +254,15 @@ def drawQR(canvas):
     for i in range(x):
         for j in range(y):
             if (blocks[(i,j)][0]):
-                figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill="white")
+                for k in range(1,x*y+1):
+                    if (robots[blocks[(i,j)][1]][0] == robot_list[k][0]):
+                        figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill=robots[blocks[(i,j)][1]][4])
+                        found = True
+                        break
+                            
+                if not found:    
+                    figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill="white")
+                    found = False
         
 def drawRobot(direction,xco,yco,canvas, color):
     xco -= 1
