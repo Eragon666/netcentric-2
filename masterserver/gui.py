@@ -22,13 +22,13 @@ y = 4
 colorList = ["red", "blue", "yellow", "green", "orange", "pink", "black", "purple", "brown"]
 
 global OccupiedLocations
-OccupiedLocations = [[0 for i in xrange(y+2)] for j in xrange(x+2)] 
-for i in range(x+2):
-    OccupiedLocations[i][y+1] = 1
+OccupiedLocations = [[0 for i in xrange(x+2)] for j in xrange(y+2)] 
+for i in range(y+2):
+    OccupiedLocations[i][x+1] = 1
     OccupiedLocations[i][0] = 1
 
-for i in range(y+2):
-    OccupiedLocations[x+1][i] = 1
+for i in range(x+2):
+    OccupiedLocations[y+1][i] = 1
     OccupiedLocations[0][i] = 1
 
 global robot_list
@@ -117,15 +117,15 @@ def listenBluetooth():
             newX = currentX - 1
             newY = currentY
           
-        if OccupiedLocations[newX][newY] == 1:
+        if OccupiedLocations[newY][newX] == 1:
             print "locations array"
             return "False"
               
         
-        OccupiedLocations[newX][newY] = 1
-        OccupiedLocations[currentX][currentY] = 0
-        for i in range(6):
-            print OccupiedLocations[:][i]
+        OccupiedLocations[newY][newX] = 1
+        OccupiedLocations[currentY][currentX] = 0
+        for i in range(y+2):
+            print OccupiedLocations[y+1-i]
             
         return "True"
     
