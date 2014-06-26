@@ -19,7 +19,7 @@ x = 4
 global y
 y = 4
 
-colorList = ["red", "yellow", "blue", "green", "orange", "pink", "black", "purple", "brown"]
+colorList = ["red", "blue", "yellow", "green", "orange", "pink", "black", "purple", "brown"]
 
 global OccupiedLocations
 OccupiedLocations = [[0 for i in xrange(y+2)] for j in xrange(x+2)] 
@@ -160,7 +160,7 @@ def listenBluetooth():
                 print("Accepted connection from ", addr, "with robotid: ", robot_list[random_val][0])
             else:
                 data = s.recv(1024)
-                print "s ", s
+                
                 if data:
                     if "QRdata: " in data:
                         QRdata = data.replace("QRdata: ", "")
@@ -192,13 +192,8 @@ def listenBluetooth():
                         else:
                             s.send("currentLocation: " + currentLocation)
                     print data
-                    # print writable
-                    # for mac in robot_list:
-                        # for write in writable:
-                            # print write
-                            # if write == mac[2]:
                     parser(data, s)
-                    print robots
+                    
                     gui()
                     print("received [%s]" % data)
                 else:
@@ -284,10 +279,8 @@ def drawRobot(direction,xco,yco,canvas, color):
 
 def gui():
     global root
-    global direction
     global x
     global y
-    global OccupiedLocations
 
     entry = tk.Entry(root)
     stvar=tk.StringVar()
