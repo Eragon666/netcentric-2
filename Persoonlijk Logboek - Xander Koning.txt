@@ -77,3 +77,11 @@ Maar de GUI moet pas vakjes printen als ze gescand zijn. Dat hebben we vandaag i
 
 wo 25-6:
 
+Verschillende robots hebben we vandaag ook verschillende kleuren kunnen geven. Ook hebben we de robots
+voor het eerst echt getest op de grond met een 4 bij 4 veld.
+
+do 26-6:
+
+Nu kan je zien of een vakje wat gescand is een eindpunt is, en dat wordt weergegeven d.m.v. een
+wit vakje met een rand in de kleur van de overeenkomende robot.
+Verder tekst voor op de poster bedacht. En een stuk geschreven van de paper over de GUI.
