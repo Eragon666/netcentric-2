@@ -43,9 +43,9 @@ robots = {}
 
 global blocks
 blocks = {}
-for i in range(x+1):
-    for j in range(y+1):
-        blocks[(i,j)] = [False, "None"]
+for i in range(x+2):
+    for j in range(y+2):
+        blocks[(i,j)] = [False, "black"]
 
 global clients
 clients = []
@@ -171,6 +171,7 @@ def listenBluetooth():
                                 if mac[0] == int(robot_id):
                                         for write in writable:
                                                 if write == mac[2]:
+                                                        setBlocks(currentLocation, robots[write][4])
                                                         print "Sent message to ", write
                                                         write.send("finalDestination: " + currentLocation)
                                         
@@ -254,16 +255,10 @@ def drawQR(canvas):
     for i in range(x):
         for j in range(y):
             if (blocks[(i,j)][0]):
-                for k in range(1,x*y+1):
-                    if (robots[blocks[(i,j)][1]][0] == robot_list[k][0]):
-                        figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill=robots[blocks[(i,j)][1]][4])
-                        found = True
-                        break
-                            
-                if not found:    
-                    figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, fill="white")
-                    found = False
-        
+
+                figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, width=2, outline=blocks[(i,j)][1], fill="white")
+          
+    
 def drawRobot(direction,xco,yco,canvas, color):
     xco -= 1
     yco -= 1
@@ -324,6 +319,14 @@ def handler(self):
         print("vamos a la playa")
         self.root.quit()
         
+def setBlocks(location, color):
+    extract = re.findall(r'\d+', location)
+    if extract:
+        i = int(extract[0])
+        j = int(extract[1])
+        
+        blocks[(i-1, j-1)] = [True, color]
+    
 def parser(data, conn):
     extract = re.findall(r'\d+',data)
     if extract:
@@ -337,7 +340,7 @@ def parser(data, conn):
         robots[conn][1] = robotX
         robots[conn][2] = robotY
         robots[conn][3] = direction
-        blocks[(robotX-1, robotY-1)] = [True, conn]
+        blocks[(robotX-1, robotY-1)][0] = True
     else:
         m = re.search('direction: (.+?)', data)
         if m:
