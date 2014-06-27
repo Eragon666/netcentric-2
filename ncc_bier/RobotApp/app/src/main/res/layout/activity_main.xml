@@ -1,0 +1,207 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${packageName}.${activityClass}">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:id="@+id/scrollView"
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Camera Preview"
+                android:id="@+id/show_camera_layout"
+                android:layout_gravity="center_horizontal" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:id="@+id/camera_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <FrameLayout
+                    android:id="@+id/cameraPreview"
+                    android:layout_width="70pt"
+                    android:layout_height="70pt"
+                    android:layout_gravity="center"
+                />
+                <TextView
+                    android:id="@+id/scanText"
+                    android:text="Scanning..."
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+                </TextView>
+                <Button
+                    android:id="@+id/ScanButton"
+                    android:text="Scan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Connections"
+                android:id="@+id/show_mbed_layout" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/mbed_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="mBed"
+                    android:id="@+id/mbed_title"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/mbed_connected"
+                    android:text="@string/not_connected" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Bluetooth (slave)"
+                    android:id="@+id/slave_mode_title"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginTop="10dp" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Own address:"
+                        android:id="@+id/own_address_prefix" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:id="@+id/own_address"
+                        android:layout_marginLeft="5dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:id="@+id/listener_status"
+                    android:text="Status not available"
+                    android:layout_marginTop="5dp" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/listener"
+                    android:layout_below="@+id/listener_status"
+                    android:text="Connect to master"
+                    android:enabled="false"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/disconnect"
+                    android:text="Disconnect master"
+                    android:enabled="false"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Manual Controls"
+                android:id="@+id/show_manual_layout" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/manual_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Forward"
+                    android:id="@+id/forward"
+                    android:layout_below="@+id/scrollView"
+                    android:layout_centerHorizontal="true" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Backward"
+                    android:id="@+id/backward" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Left"
+                    android:id="@+id/left" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Right"
+                    android:id="@+id/right" />
+            </LinearLayout>
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show Monitoring"
+                android:id="@+id/show_debug_layout" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/debug_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/log_comm" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
