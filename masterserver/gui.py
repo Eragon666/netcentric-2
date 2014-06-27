@@ -19,6 +19,7 @@ x = 4
 global y
 y = 4
 
+
 colorList = ["red", "blue", "yellow", "green", "orange", "pink", "black", "purple", "brown"]
 
 global OccupiedLocations
@@ -97,8 +98,8 @@ def listenBluetooth():
     
     def Confirm(currentLocation, direction):
         # Also needs a global array with all the reserved locations.
-        # Currently named: 'ReservedLocations' */
-        # Initialize 'newPosition' based on parameters.
+        # Currently named: 'OccupiedLocations' */
+        # Determine the new position based on parameters.
         newX = 0
         newY = 0
         test = currentLocation.replace("Locatie: ", "")
@@ -124,23 +125,17 @@ def listenBluetooth():
         
         OccupiedLocations[newY][newX] = 1
         OccupiedLocations[currentY][currentX] = 0
+        
         for i in range(y+2):
             print OccupiedLocations[y+1-i]
             
         return "True"
     
+    
     global root
     global colorList
     print("Waiting for connection on RFCOMM channel %d" %port)
-    global quit
-    global client_sock, client_info
-    #global clients
-    #clients.append(server_sock.accept())
-    #thread1 = Thread(target = guiMain, args=client_sock)
-    #thread1.start()
-    #threads.append(thread1)    
-    #print("Accepted connection from ", clients[-1][1])
-    #clients[-1][0].setblocking(0)
+
     while True:
         readable, writable, exceptional = select.select(read,read,[])
 
@@ -212,17 +207,13 @@ def guiMain():
     global root
     global server_sock
     gui()
-    #root.protocol("WM_DELETE_WINDOW", gui.handler)
     root.mainloop()
     print("disconnected");
     server_sock.close()
 
 def exitGui():
-    #global client_sock
-    #client_sock.close()
     server_sock.close()
-    #for thread in threads:
-        #thread.join()
+
 
 def connect():
     print "Waiting for connection"
@@ -246,7 +237,6 @@ def drawQR(canvas):
             figure=canvas.create_rectangle(nextx,canvas_height-nexty,nextx+dsize,canvas_height-nexty+dsize, fill=color)
         nexty = y
 ''' 
-    found = False
     
     dx = canvas_width/x
     dy = canvas_height/y
@@ -255,10 +245,9 @@ def drawQR(canvas):
     for i in range(x):
         for j in range(y):
             if (blocks[(i,j)][0]):
-
                 figure = canvas.create_rectangle(dx*i +size/4, canvas_height-dy*j, dx*i+size+size/4, canvas_height-dy*j-size, width=2, outline=blocks[(i,j)][1], fill="white")
           
-    
+
 def drawRobot(direction,xco,yco,canvas, color):
     xco -= 1
     yco -= 1
@@ -284,8 +273,6 @@ def drawRobot(direction,xco,yco,canvas, color):
 
 def gui():
     global root
-    global x
-    global y
 
     entry = tk.Entry(root)
     stvar=tk.StringVar()
@@ -294,11 +281,6 @@ def gui():
     canvas=tk.Canvas(root, width=canvas_width, height=canvas_height, background='grey')
     canvas.grid(row=0,column=1,ipadx=10,ipady=10)
 
-
-    label1=Label(root, text="Grid size")
-    label1.grid(row=0,column=0, sticky="nw")
-    label2=Label(root, text="X").grid(row=1,column=0, sticky="w")
-    # self.option.grid(row=0,column=1,sticky="nwe")
     e = Entry(root)
     e.grid(row = 1,column = 1,sticky = E+ W)
     text = e.get()
@@ -312,11 +294,9 @@ def gui():
 def handler(self):
     global quit
     if tkMessageBox.askokcancel("Quit?", "Are you sure you want to quit?"):
-        #client_sock.close()
         #server_sock.close()
         exitGui()
         quit = True
-        print("vamos a la playa")
         self.root.quit()
         
 def setBlocks(location, color):
@@ -357,8 +337,6 @@ def parser(data, conn):
                 robots[conn][3] = "None"
         
 if __name__== '__main__':
-    global quit
-    global client_sock, client_info
     quit = False
     
     thread = Thread(target = listenBluetooth)
